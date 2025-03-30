@@ -192,17 +192,31 @@ function App() {
 
   // Handle slot selection (dragging across calendar to create a new event)
   const handleSelectSlot = ({ start, end }) => {
+    // For react-big-calendar, the end date is exclusive, so we need to adjust
+    // for correct display in the form (which assumes inclusive end dates)
+    const adjustedEnd = new Date(end);
+    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+    
     setNewEvent({
       title: '',
       start,
-      end
+      end: adjustedEnd
     });
     setIsCreating(true);
   };
 
   // Handle event selection (clicking on an existing event)
   const handleSelectEvent = (event) => {
-    setSelectedEvent(event);
+    // For react-big-calendar, end dates are exclusive
+    // When displaying in a form, we want to show the inclusive end date (the day before)
+    const displayEvent = { ...event };
+    
+    // Adjust the end date for form display (subtract one day)
+    const adjustedEnd = new Date(event.end);
+    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+    displayEvent.end = adjustedEnd;
+    
+    setSelectedEvent(displayEvent);
     setIsCreating(false);
   };
 
@@ -214,11 +228,16 @@ function App() {
       return;
     }
 
+    // For react-big-calendar, end dates are exclusive, not inclusive
+    // We need to adjust the end date to be the day after what the user selected
+    const adjustedEnd = new Date(newEvent.end);
+    adjustedEnd.setDate(adjustedEnd.getDate() + 1);
+
     const event = {
       id: Date.now(),
       title: newEvent.title,
       start: newEvent.start,
-      end: newEvent.end,
+      end: adjustedEnd,
       allDay: true // Make event all-day for better dragging UX
     };
 
@@ -235,8 +254,18 @@ function App() {
       return;
     }
 
+    // For react-big-calendar, end dates are exclusive, not inclusive
+    // Adjust the end date for display in the calendar
+    const adjustedEvent = { ...selectedEvent };
+    
+    // We need to add a day to the end date for the calendar view
+    // This assumes the form is showing an inclusive end date
+    const adjustedEnd = new Date(selectedEvent.end);
+    adjustedEnd.setDate(adjustedEnd.getDate() + 1);
+    adjustedEvent.end = adjustedEnd;
+
     const updatedEvents = events.map(event => 
-      event.id === selectedEvent.id ? selectedEvent : event
+      event.id === selectedEvent.id ? adjustedEvent : event
     );
     setEvents(updatedEvents);
     setSelectedEvent(null);
@@ -307,6 +336,10 @@ function App() {
   const moveEvent = ({ event, start, end }) => {
     // Ensure we're working with dates
     const startDate = new Date(start);
+    
+    // For react-big-calendar, when displaying all-day events
+    // the end date is exclusive, so we need to adjust when displaying in the form
+    // Calendar returns the day after (exclusive end), so we're good here - no adjustment needed
     const endDate = new Date(end);
     
     const updatedEvents = events.map(existingEvent => {
@@ -326,6 +359,10 @@ function App() {
   // Handle resizing events (updating start or end date)
   const resizeEvent = ({ event, start, end }) => {
     const startDate = new Date(start);
+    
+    // For react-big-calendar, when displaying all-day events
+    // the end date is exclusive, so the default behavior is correct here
+    // (the calendar already provides the day after the visual end as the actual end date)
     const endDate = new Date(end);
     
     const updatedEvents = events.map(existingEvent => {
