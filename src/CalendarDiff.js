@@ -7,7 +7,6 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
   const [diffResults, setDiffResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [comparisonEvents, setComparisonEvents] = useState([]);
 
   const handleCompare = async () => {
     if (!comparisonUrl) {
@@ -20,13 +19,11 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
     
     try {
       const loadedComparisonEvents = await loadEventsFromURL(comparisonUrl);
-      setComparisonEvents(loadedComparisonEvents);
       const results = compareCalendars(currentEvents, loadedComparisonEvents);
       setDiffResults(results);
     } catch (err) {
       setError(`Error loading comparison calendar: ${err.message}`);
       setDiffResults(null);
-      setComparisonEvents([]);
     } finally {
       setIsLoading(false);
     }
