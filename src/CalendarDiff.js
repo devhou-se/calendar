@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { compareCalendars, loadEventsFromURL } from './diffService';
 import moment from 'moment';
-import CalendarVisualDiff from './CalendarVisualDiff';
 
 const CalendarDiff = ({ currentEvents, onClose }) => {
   const [comparisonUrl, setComparisonUrl] = useState('');
   const [diffResults, setDiffResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showVisualDiff, setShowVisualDiff] = useState(false);
   const [comparisonEvents, setComparisonEvents] = useState([]);
 
   const handleCompare = async () => {
@@ -43,16 +41,7 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
     </div>
   );
 
-  // If visual diff is active, show that instead
-  if (showVisualDiff && comparisonEvents.length > 0) {
-    return (
-      <CalendarVisualDiff
-        currentEvents={currentEvents}
-        comparisonEvents={comparisonEvents}
-        onClose={() => setShowVisualDiff(false)}
-      />
-    );
-  }
+  // Removed visual diff functionality
 
   return (
     <div className="calendar-diff">
@@ -167,13 +156,6 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
 
       {diffResults && (
         <div className="diff-view-buttons">
-          <button 
-            onClick={() => setShowVisualDiff(true)} 
-            className="visual-diff-button"
-            disabled={!comparisonEvents || comparisonEvents.length === 0}
-          >
-            Show Calendar View
-          </button>
           <button onClick={onClose} className="close-button">Close</button>
         </div>
       )}
