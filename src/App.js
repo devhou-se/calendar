@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { useSearchParams } from 'react-router-dom';
+import { generateCalendarPreview, updateMetaTags } from './previewService';
 
 // Create a DnD Calendar
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -68,34 +69,49 @@ const decodeEventsFromURL = (encodedData) => {
 function App() {
   // Setup URL parameters
   const [searchParams, setSearchParams] = useSearchParams();
+  // State for current date/view of calendar
+  const [currentDate, setCurrentDate] = useState(new Date());
+  // Ref for the calendar element (used for preview generation)
+  const calendarRef = useRef(null);
   
   // Load events from URL or localStorage on initial render
   const loadInitialEvents = () => {
     // Check if we have events in the URL
     const encodedEvents = searchParams.get('data');
     
+    let loadedEvents = [];
     if (encodedEvents) {
       // If URL has events, use those
-      return decodeEventsFromURL(encodedEvents);
+      loadedEvents = decodeEventsFromURL(encodedEvents);
     } else {
       // Otherwise load from localStorage
       const savedEvents = localStorage.getItem('travelCalendarEvents');
       if (savedEvents) {
         try {
           // Parse the JSON string and convert date strings back to Date objects
-          const parsedEvents = JSON.parse(savedEvents).map(event => ({
+          loadedEvents = JSON.parse(savedEvents).map(event => ({
             ...event,
             start: new Date(event.start),
             end: new Date(event.end)
           }));
-          return parsedEvents;
         } catch (e) {
           console.error('Error loading events from localStorage:', e);
-          return [];
         }
       }
     }
-    return [];
+    
+    // If we have events, find earliest date and set current view to that month
+    if (loadedEvents.length > 0) {
+      const earliestDate = loadedEvents.reduce((earliest, event) => {
+        const eventStart = new Date(event.start);
+        return eventStart < earliest ? eventStart : earliest;
+      }, new Date(loadedEvents[0].start));
+      
+      // Set the calendar to show the month of the earliest event
+      setCurrentDate(earliestDate);
+    }
+    
+    return loadedEvents;
   };
 
   const [events, setEvents] = useState(loadInitialEvents);
@@ -159,6 +175,30 @@ function App() {
     });
     
     setCityColors(cities);
+  }, [events]);
+  
+  // Generate preview image for social sharing when events change
+  useEffect(() => {
+    // Wait for the calendar to be rendered and stable
+    const generatePreview = async () => {
+      if (events.length > 0 && calendarRef.current) {
+        // Give the calendar time to fully render
+        setTimeout(async () => {
+          try {
+            // Generate preview image
+            const previewImage = await generateCalendarPreview(calendarRef, events);
+            if (previewImage) {
+              // Update meta tags with the generated image
+              updateMetaTags(previewImage);
+            }
+          } catch (err) {
+            console.error('Error generating preview:', err);
+          }
+        }, 1000); // Wait 1 second for the calendar to stabilize
+      }
+    };
+    
+    generatePreview();
   }, [events]);
 
   // Function to get event style based on city
@@ -352,10 +392,22 @@ function App() {
   };
   
   // Generate sharable link with current calendar data
-  const handleShareLink = () => {
+  const handleShareLink = async () => {
     try {
       const encodedData = encodeEventsToURL(events);
       if (encodedData) {
+        // Ensure the preview image is generated
+        if (events.length > 0 && calendarRef.current) {
+          try {
+            const previewImage = await generateCalendarPreview(calendarRef, events);
+            if (previewImage) {
+              updateMetaTags(previewImage);
+            }
+          } catch (err) {
+            console.error('Error generating preview for sharing:', err);
+          }
+        }
+        
         // Create full URL with encoded data
         const shareableUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
         
@@ -513,28 +565,32 @@ function App() {
         </div>
       )}
 
-      <DnDCalendar
-        localizer={localizer}
-        events={events}
-        startAccessor="start"
-        endAccessor="end"
-        selectable
-        resizable
-        onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelectEvent}
-        onEventDrop={moveEvent}
-        onEventResize={resizeEvent}
-        eventPropGetter={eventStyleGetter}
-        defaultView="month"
-        views={['month', 'week']}
-        step={60}
-        showMultiDayTimes
-        popup
-        style={{ height: 700 }}
-        drilldownView={null}
-        resizableAccessor={() => true}  // Make all events resizable
-        draggableAccessor={() => true}  // Make all events draggable
-      />
+      <div ref={calendarRef}>
+        <DnDCalendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          selectable
+          resizable
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          onEventDrop={moveEvent}
+          onEventResize={resizeEvent}
+          eventPropGetter={eventStyleGetter}
+          defaultView="month"
+          views={['month', 'week']}
+          step={60}
+          showMultiDayTimes
+          popup
+          style={{ height: 700 }}
+          drilldownView={null}
+          resizableAccessor={() => true}  // Make all events resizable
+          draggableAccessor={() => true}  // Make all events draggable
+          date={currentDate}
+          onNavigate={date => setCurrentDate(date)}
+        />
+      </div>
     </div>
   );
 }
