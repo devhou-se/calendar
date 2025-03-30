@@ -4,6 +4,7 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
+import { useSearchParams } from 'react-router-dom';
 
 // Create a DnD Calendar
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -27,28 +28,77 @@ const CITY_COLORS = [
   '#2EC4B6', // Turquoise
 ];
 
+// Functions for URL encoding/decoding
+const encodeEventsToURL = (events) => {
+  if (!events || events.length === 0) return '';
+  
+  // Convert dates to ISO strings before serializing
+  const serializedEvents = events.map(event => ({
+    ...event,
+    start: event.start ? event.start.toISOString() : null,
+    end: event.end ? event.end.toISOString() : null
+  }));
+  
+  // Serialize to JSON and compress
+  const jsonString = JSON.stringify(serializedEvents);
+  // Use Base64 encoding for URL safety, but also handle special chars
+  return btoa(encodeURIComponent(jsonString));
+};
+
+const decodeEventsFromURL = (encodedData) => {
+  if (!encodedData) return [];
+  
+  try {
+    // Decode Base64 and URL encoding
+    const jsonString = decodeURIComponent(atob(encodedData));
+    const parsedEvents = JSON.parse(jsonString);
+    
+    // Convert ISO strings back to Date objects
+    return parsedEvents.map(event => ({
+      ...event,
+      start: event.start ? new Date(event.start) : null,
+      end: event.end ? new Date(event.end) : null
+    }));
+  } catch (e) {
+    console.error('Error decoding events from URL:', e);
+    return [];
+  }
+};
+
 function App() {
-  // Load events from localStorage on initial render
-  const loadEventsFromStorage = () => {
-    const savedEvents = localStorage.getItem('travelCalendarEvents');
-    if (savedEvents) {
-      try {
-        // Parse the JSON string and convert date strings back to Date objects
-        const parsedEvents = JSON.parse(savedEvents).map(event => ({
-          ...event,
-          start: new Date(event.start),
-          end: new Date(event.end)
-        }));
-        return parsedEvents;
-      } catch (e) {
-        console.error('Error loading events from localStorage:', e);
-        return [];
+  // Setup URL parameters
+  const [searchParams, setSearchParams] = useSearchParams();
+  
+  // Load events from URL or localStorage on initial render
+  const loadInitialEvents = () => {
+    // Check if we have events in the URL
+    const encodedEvents = searchParams.get('data');
+    
+    if (encodedEvents) {
+      // If URL has events, use those
+      return decodeEventsFromURL(encodedEvents);
+    } else {
+      // Otherwise load from localStorage
+      const savedEvents = localStorage.getItem('travelCalendarEvents');
+      if (savedEvents) {
+        try {
+          // Parse the JSON string and convert date strings back to Date objects
+          const parsedEvents = JSON.parse(savedEvents).map(event => ({
+            ...event,
+            start: new Date(event.start),
+            end: new Date(event.end)
+          }));
+          return parsedEvents;
+        } catch (e) {
+          console.error('Error loading events from localStorage:', e);
+          return [];
+        }
       }
     }
     return [];
   };
 
-  const [events, setEvents] = useState(loadEventsFromStorage);
+  const [events, setEvents] = useState(loadInitialEvents);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -67,21 +117,34 @@ function App() {
     }, 3000); // Hide after 3 seconds
   };
 
-  // Save events to localStorage whenever they change
+  // Save events to localStorage and update URL whenever they change
   useEffect(() => {
-    if (events.length > 0) {
+    // Don't update for empty events
+    if (events.length > 0 || searchParams.has('data')) {
       try {
+        // Save to localStorage
         localStorage.setItem('travelCalendarEvents', JSON.stringify(events));
+        
+        // Update the URL
+        const encodedData = encodeEventsToURL(events);
+        if (encodedData) {
+          setSearchParams({ data: encodedData }, { replace: true });
+        } else if (searchParams.has('data')) {
+          // Remove the data parameter if there are no events
+          searchParams.delete('data');
+          setSearchParams(searchParams, { replace: true });
+        }
+        
         // Only show notification when events are added or modified, not on initial load
         if (events.length && document.visibilityState === 'visible') {
-          showNotification('Calendar saved to local storage');
+          showNotification('Calendar saved and URL updated');
         }
       } catch (e) {
-        console.error('Error saving events to localStorage:', e);
-        showNotification('Failed to save calendar to local storage', 'error');
+        console.error('Error saving events:', e);
+        showNotification('Failed to save calendar data', 'error');
       }
     }
-  }, [events]);
+  }, [events, searchParams, setSearchParams]);
 
   // Assign colors to cities
   useEffect(() => {
@@ -276,8 +339,41 @@ function App() {
       setEvents([]);
       setSelectedEvent(null);
       setIsCreating(false);
+      
+      // Clear localStorage
       localStorage.removeItem('travelCalendarEvents');
+      
+      // Clear URL parameter
+      searchParams.delete('data');
+      setSearchParams(searchParams, { replace: true });
+      
       showNotification('Calendar cleared successfully');
+    }
+  };
+  
+  // Generate sharable link with current calendar data
+  const handleShareLink = () => {
+    try {
+      const encodedData = encodeEventsToURL(events);
+      if (encodedData) {
+        // Create full URL with encoded data
+        const shareableUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(shareableUrl)
+          .then(() => {
+            showNotification('Shareable link copied to clipboard!');
+          })
+          .catch(err => {
+            console.error('Could not copy link: ', err);
+            showNotification('Failed to copy link to clipboard', 'error');
+          });
+      } else {
+        showNotification('No events to share', 'info');
+      }
+    } catch (e) {
+      console.error('Error generating share link:', e);
+      showNotification('Error generating share link', 'error');
     }
   };
 
@@ -286,13 +382,21 @@ function App() {
       <h1>Travel Calendar</h1>
       
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-        <button onClick={handleClearCalendar} className="clear">
-          Clear Calendar
-        </button>
+        <div>
+          <button onClick={handleClearCalendar} className="clear">
+            Clear Calendar
+          </button>
+        </div>
         
-        <button onClick={handleExportCalendar} className="export">
-          Export Calendar (ICS)
-        </button>
+        <div>
+          <button onClick={handleShareLink} className="share" style={{ marginRight: '10px' }}>
+            Share Link
+          </button>
+          
+          <button onClick={handleExportCalendar} className="export">
+            Export Calendar (ICS)
+          </button>
+        </div>
       </div>
       
       {/* Notification component */}
