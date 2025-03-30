@@ -159,19 +159,24 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
         style.backgroundColor = '#F44336'; 
         break;
       case 'modified':
-        // Modified events - enhanced visual design to show both versions
-        style.backgroundColor = '#FF9800';
+        // Modified events - enhanced visual design to show both versions side-by-side
+        style.backgroundColor = 'white';
         style.border = '2px solid #FF5722';
-        // Using a smoother gradient transition
-        style.backgroundImage = 'linear-gradient(135deg, rgba(255,152,0,0.9) 40%, rgba(33,150,243,0.9) 60%)';
-        style.boxShadow = '0 2px 4px rgba(0,0,0,0.2), inset 0 -2px 0 rgba(0,0,0,0.1)';
+        // Remove background image for cleaner look with side-by-side content
+        style.backgroundImage = 'none';
+        style.boxShadow = '0 2px 6px rgba(0,0,0,0.2)';
         style.color = 'black';
-        style.fontWeight = 'bold';
-        style.textShadow = '0px 0px 2px white';
-        // Add a slightly larger padding for better readability of changed content
-        style.padding = '3px 6px';
+        // Add more height to accommodate the side-by-side comparison
+        style.height = 'auto';
+        style.minHeight = '36px';
+        // Add padding for better spacing
+        style.padding = '0';
         // Ensure the element is on top of other events
         style.zIndex = 50;
+        // Allow content to be visible
+        style.overflow = 'visible';
+        // Remove text shadow for cleaner text
+        style.textShadow = 'none';
         break;
       case 'comparison':
         // Other version of modified events - blue
@@ -279,39 +284,32 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
       const startChanged = new Date(event.originalEvent.start).getTime() !== new Date(event.modifiedEvent.start).getTime();
       const endChanged = new Date(event.originalEvent.end).getTime() !== new Date(event.modifiedEvent.end).getTime();
       
-      // Create a label that shows the changes
-      let changeLabel = '';
-      if (titleChanged) {
-        changeLabel = `${origTitle} → ${modTitle}`;
-      } else {
-        changeLabel = origTitle;
-      }
-      
       const origStart = moment(event.originalEvent.start).format('MMM DD');
       const modStart = moment(event.modifiedEvent.start).format('MMM DD');
       const origEnd = moment(event.originalEvent.end).format('MMM DD');
       const modEnd = moment(event.modifiedEvent.end).format('MMM DD');
-      
-      let dateChangeLabel = '';
-      if (startChanged && endChanged) {
-        dateChangeLabel = `${origStart}-${origEnd} → ${modStart}-${modEnd}`;
-      } else if (startChanged) {
-        dateChangeLabel = `Start: ${origStart} → ${modStart}`;
-      } else if (endChanged) {
-        dateChangeLabel = `End: ${origEnd} → ${modEnd}`;
-      }
-      
+
+      // Create a side-by-side visual representation
       return (
         <div className={className}>
-          <div className="event-split-content">
-            <div className="event-title-change">
-              {changeLabel}
+          <div className="event-comparison-container">
+            <div className="event-side original">
+              <div className="event-side-title">{origTitle}</div>
+              <div className="event-side-dates">{origStart} - {origEnd}</div>
             </div>
-            {(startChanged || endChanged) && (
-              <div className="event-dates-change">
-                <span className="date-change">{dateChangeLabel}</span>
+            
+            <div className="event-changes-divider">
+              <div className="change-arrows">
+                {titleChanged && <span className="arrow-icon">→</span>}
+                {startChanged && <span className="arrow-icon">→</span>}
+                {endChanged && <span className="arrow-icon">→</span>}
               </div>
-            )}
+            </div>
+            
+            <div className="event-side modified">
+              <div className="event-side-title">{modTitle}</div>
+              <div className="event-side-dates">{modStart} - {modEnd}</div>
+            </div>
           </div>
         </div>
       );
@@ -401,32 +399,69 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
                 </div>
               )}
               
-              <div className="tooltip-section your-event">
-                <div className="tooltip-label">Your version:</div>
-                <div className="tooltip-title-small">{origTitle}</div>
-                <div className="tooltip-dates">
-                  {moment(event.originalEvent.start).format('MMM DD, YYYY')} - {moment(event.originalEvent.end).format('MMM DD, YYYY')}
-                </div>
-              </div>
-              
-              <div className="tooltip-section other-event">
-                <div className="tooltip-label">Other version:</div>
-                <div className="tooltip-title-small">{modTitle}</div>
-                <div className="tooltip-dates">
-                  {moment(event.modifiedEvent.start).format('MMM DD, YYYY')} - {moment(event.modifiedEvent.end).format('MMM DD, YYYY')}
+              <div className="events-visual-comparison">
+                <div className="events-comparison-title">Visual Comparison:</div>
+                <div className="events-side-by-side">
+                  <div className="event-comparison-box original">
+                    <div className="event-box-header">Original Event</div>
+                    <div className="event-box-content">
+                      <div className="event-box-title">{origTitle}</div>
+                      <div className="event-box-dates">
+                        <div className="event-date">
+                          <span className="date-label">From:</span>
+                          <span className="date-value">{moment(event.originalEvent.start).format('MMM DD, YYYY')}</span>
+                        </div>
+                        <div className="event-date">
+                          <span className="date-label">To:</span>
+                          <span className="date-value">{moment(event.originalEvent.end).format('MMM DD, YYYY')}</span>
+                        </div>
+                        <div className="event-duration">
+                          <span className="duration-label">Duration:</span>
+                          <span className="duration-value">{moment(event.originalEvent.end).diff(moment(event.originalEvent.start), 'days')} days</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="event-comparison-arrows">
+                    {titleChanged && <div className="comparison-arrow title-arrow">→</div>}
+                    {startChanged && <div className="comparison-arrow start-arrow">→</div>}
+                    {endChanged && <div className="comparison-arrow end-arrow">→</div>}
+                  </div>
+                  
+                  <div className="event-comparison-box modified">
+                    <div className="event-box-header">Modified Event</div>
+                    <div className="event-box-content">
+                      <div className="event-box-title">{modTitle}</div>
+                      <div className="event-box-dates">
+                        <div className="event-date">
+                          <span className="date-label">From:</span>
+                          <span className="date-value">{moment(event.modifiedEvent.start).format('MMM DD, YYYY')}</span>
+                        </div>
+                        <div className="event-date">
+                          <span className="date-label">To:</span>
+                          <span className="date-value">{moment(event.modifiedEvent.end).format('MMM DD, YYYY')}</span>
+                        </div>
+                        <div className="event-duration">
+                          <span className="duration-label">Duration:</span>
+                          <span className="duration-value">{moment(event.modifiedEvent.end).diff(moment(event.modifiedEvent.start), 'days')} days</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
               <div className="tooltip-summary">
                 <div className="tooltip-summary-title">Summary of Changes:</div>
                 <ul className="tooltip-summary-list">
-                  {titleChanged && <li>City name changed from "{origTitle}" to "{modTitle}"</li>}
-                  {startChanged && <li>Start date moved from {moment(event.originalEvent.start).format('MMM DD, YYYY')} to {moment(event.modifiedEvent.start).format('MMM DD, YYYY')}</li>}
-                  {endChanged && <li>End date moved from {moment(event.originalEvent.end).format('MMM DD, YYYY')} to {moment(event.modifiedEvent.end).format('MMM DD, YYYY')}</li>}
+                  {titleChanged && <li>City name changed from "<span className="highlight">{origTitle}</span>" to "<span className="highlight">{modTitle}</span>"</li>}
+                  {startChanged && <li>Start date moved from <span className="highlight">{moment(event.originalEvent.start).format('MMM DD, YYYY')}</span> to <span className="highlight">{moment(event.modifiedEvent.start).format('MMM DD, YYYY')}</span></li>}
+                  {endChanged && <li>End date moved from <span className="highlight">{moment(event.originalEvent.end).format('MMM DD, YYYY')}</span> to <span className="highlight">{moment(event.modifiedEvent.end).format('MMM DD, YYYY')}</span></li>}
                   
                   {startChanged || endChanged ? (
                     <li>
-                      Duration changed from {moment(event.originalEvent.end).diff(moment(event.originalEvent.start), 'days')} days to {moment(event.modifiedEvent.end).diff(moment(event.modifiedEvent.start), 'days')} days
+                      Duration changed from <span className="highlight">{moment(event.originalEvent.end).diff(moment(event.originalEvent.start), 'days')} days</span> to <span className="highlight">{moment(event.modifiedEvent.end).diff(moment(event.modifiedEvent.start), 'days')} days</span>
                     </li>
                   ) : null}
                 </ul>

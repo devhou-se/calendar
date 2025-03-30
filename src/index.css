@@ -379,48 +379,77 @@ button.share:hover {
   overflow: visible !important;
 }
 
-.event-split-content {
+.event-comparison-container {
   display: flex;
-  flex-direction: column;
   width: 100%;
   position: relative;
   z-index: 10;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 100%;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 4px;
 }
 
-.event-title-change {
+.event-side {
+  flex: 1;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.event-side.original {
+  background-color: rgba(76, 175, 80, 0.15);
+  border-radius: 3px 0 0 3px;
+  border-right: 1px dashed #4CAF50;
+}
+
+.event-side.modified {
+  background-color: rgba(33, 150, 243, 0.15);
+  border-radius: 0 3px 3px 0;
+  border-left: 1px dashed #2196F3;
+}
+
+.event-side-title {
   font-weight: bold;
   font-size: 12px;
-  margin-bottom: 2px;
-  position: relative;
-  z-index: 10;
-  background: linear-gradient(90deg, rgba(255,235,59,0.5) 0%, rgba(255,152,0,0.5) 100%);
-  border-radius: 3px;
-  padding: 1px 3px;
-  text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.8);
-}
-
-.event-dates-change {
-  font-size: 10px;
-  font-style: italic;
-  background: rgba(33, 150, 243, 0.3);
-  border-radius: 3px;
-  padding: 1px 3px;
-  width: fit-content;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.date-change {
-  display: flex;
-  align-items: center;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #333;
 }
 
-.date-change::before {
-  content: '⟳';
-  margin-right: 3px;
+.event-side-dates {
+  font-size: 10px;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-changes-divider {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 2px;
+  z-index: 15;
+  position: relative;
+}
+
+.change-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.arrow-icon {
   font-weight: bold;
+  color: #FF5722;
+  font-size: 12px;
+  text-shadow: 0px 0px 1px white;
 }
 
 /* Style for modified events with arrow indicators */
@@ -441,8 +470,13 @@ button.share:hover {
   border-radius: 4px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   min-width: 200px;
-  max-width: 300px;
+  max-width: 400px;
   z-index: 3000;
+}
+
+.event-tooltip.modified-event {
+  max-width: 500px;
+  min-width: 400px;
 }
 
 .tooltip-title {
@@ -549,6 +583,131 @@ button.share:hover {
   font-weight: bold;
   font-size: 14px;
   margin: 3px 0;
+}
+
+.events-visual-comparison {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.events-comparison-title {
+  background-color: #673AB7;
+  color: white;
+  font-weight: bold;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+.events-side-by-side {
+  display: flex;
+  align-items: stretch;
+  min-height: 150px;
+}
+
+.event-comparison-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: relative;
+}
+
+.event-comparison-box.original {
+  background-color: rgba(76, 175, 80, 0.08);
+  border-right: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.event-comparison-box.modified {
+  background-color: rgba(33, 150, 243, 0.08);
+}
+
+.event-box-header {
+  background-color: #f5f5f5;
+  padding: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.event-comparison-box.original .event-box-header {
+  color: #2E7D32;
+  background-color: rgba(76, 175, 80, 0.15);
+}
+
+.event-comparison-box.modified .event-box-header {
+  color: #1565C0;
+  background-color: rgba(33, 150, 243, 0.15);
+}
+
+.event-box-content {
+  padding: 12px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-box-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.event-comparison-box.original .event-box-title {
+  color: #2E7D32;
+}
+
+.event-comparison-box.modified .event-box-title {
+  color: #1565C0;
+}
+
+.event-box-dates {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.event-date, .event-duration {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.date-label, .duration-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.event-comparison-arrows {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+.comparison-arrow {
+  width: 24px;
+  height: 24px;
+  background-color: #FF5722;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tooltip-summary {
