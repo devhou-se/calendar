@@ -2,6 +2,10 @@
 
 A web application that lets you create and manage your travel itinerary on a calendar interface.
 
+## Live Demo
+
+Check out the live app at [https://devhou-se.github.io/calendar](https://devhou-se.github.io/calendar)
+
 ## Features
 
 - Interactive calendar view
@@ -43,3 +47,17 @@ The app will open in your default browser at [http://localhost:3000](http://loca
 3. **Move an event**: Drag and drop an event to new dates
 4. **Resize an event**: Drag the edges of an event to change start/end dates
 5. **Export calendar**: Click the "Export Calendar (ICS)" button
+
+## Deployment
+
+This project is configured to automatically deploy to GitHub Pages when changes are pushed to the main branch. The deployment is handled by a GitHub Actions workflow.
+
+### Manual Deployment
+
+You can also manually deploy the app to GitHub Pages with:
+
+```bash
+npm run deploy
+```
+
+This will build the app and push it to the `gh-pages` branch, which is configured to be served on GitHub Pages.
