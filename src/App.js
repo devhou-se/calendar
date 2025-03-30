@@ -108,7 +108,14 @@ function App() {
         opacity: 0.8,
         color: 'white',
         border: '0px',
-        display: 'block'
+        display: 'block',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        paddingLeft: '18px',
+        paddingRight: '18px',
+        minHeight: '24px',
+        lineHeight: '1.2'
       }
     };
   };

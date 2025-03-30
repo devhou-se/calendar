@@ -15,45 +15,62 @@ body {
 /* Make events easier to grab and drag */
 .rbc-event {
   cursor: move !important;
-  padding: 5px !important;
+  padding: 5px 18px !important; /* Add extra padding on the sides for resize handles */
   border-radius: 5px !important;
   font-weight: bold !important;
+  position: relative !important;
 }
 
-/* Style for the resize handle */
+/* Style for the event content to prevent overlapping with resize handles */
 .rbc-event-content {
   font-size: 14px;
+  margin: 0 10px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  position: relative !important;
+  z-index: 1 !important;
 }
 
 /* Make the event resize handles more visible and larger */
 .rbc-event .rbc-addons-dnd-resize-ns-anchor,
 .rbc-event .rbc-addons-dnd-resize-ew-anchor {
-  width: 12px !important;
-  height: 12px !important;
+  width: 14px !important;
+  height: 14px !important;
   background-color: white !important;
   border: 2px solid #333 !important;
   border-radius: 50% !important;
-  z-index: 10 !important;
+  z-index: 20 !important; /* Higher z-index to ensure handles are on top */
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3) !important;
+  position: absolute !important;
 }
 
 /* Style the end resize handle */
 .rbc-event .rbc-addons-dnd-resize-ew-anchor-end {
-  right: -6px !important;
+  right: -7px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
 }
 
 /* Style the start resize handle */
 .rbc-event .rbc-addons-dnd-resize-ew-anchor-start {
-  left: -6px !important;
+  left: -7px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
 }
 
 /* Style the top resize handle */
 .rbc-event .rbc-addons-dnd-resize-ns-anchor-top {
-  top: -6px !important;
+  top: -7px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
 }
 
 /* Style the bottom resize handle */
 .rbc-event .rbc-addons-dnd-resize-ns-anchor-bottom {
-  bottom: -6px !important;
+  bottom: -7px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
 }
 
 /* Highlight events when hovered */
@@ -62,6 +79,15 @@ body {
   transform: scale(1.02);
   transition: transform 0.1s ease-in-out;
   z-index: 1000 !important;
+}
+
+/* Enhance resize handles on hover */
+.rbc-event:hover .rbc-addons-dnd-resize-ns-anchor,
+.rbc-event:hover .rbc-addons-dnd-resize-ew-anchor {
+  width: 16px !important;
+  height: 16px !important;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5) !important;
+  transition: all 0.2s ease-in-out !important;
 }
 
 .event-form {
