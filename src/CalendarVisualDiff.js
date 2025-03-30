@@ -142,7 +142,6 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
       borderRadius: '5px',
       opacity: 0.8,
       color: 'white',
-      border: '0px',
       display: 'block',
       textOverflow: 'ellipsis',
       overflow: 'hidden',
@@ -160,13 +159,31 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
         style.backgroundColor = '#F44336'; 
         break;
       case 'modified':
-        // Modified events - orange
+        // Modified events - enhanced visual design to show both versions
         style.backgroundColor = '#FF9800';
-        style.border = '2px dashed #FFC107';
+        style.border = '2px solid #FF5722';
+        // Using a smoother gradient transition
+        style.backgroundImage = 'linear-gradient(135deg, rgba(255,152,0,0.9) 40%, rgba(33,150,243,0.9) 60%)';
+        style.boxShadow = '0 2px 4px rgba(0,0,0,0.2), inset 0 -2px 0 rgba(0,0,0,0.1)';
+        style.color = 'black';
+        style.fontWeight = 'bold';
+        style.textShadow = '0px 0px 2px white';
+        // Add a slightly larger padding for better readability of changed content
+        style.padding = '3px 6px';
+        // Ensure the element is on top of other events
+        style.zIndex = 50;
         break;
       case 'comparison':
         // Other version of modified events - blue
         style.backgroundColor = '#2196F3';
+        style.border = '2px solid #1976D2';
+        break;
+      case 'modified-wrapper':
+        // Special wrapper for modified events - transparent with dashed border
+        style.backgroundColor = 'transparent';
+        style.border = '2px dashed #FF5722';
+        style.height = '100%';
+        style.padding = '0';
         break;
       default:
         style.backgroundColor = '#9E9E9E';
@@ -252,9 +269,58 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
       className += ` ${event.type}-event`;
     }
     
+    // For modified events, show a special display with both versions
+    if (event.type === 'modified' && event.modifiedEvent) {
+      const origTitle = event.originalEvent.title.split(' (')[0];
+      const modTitle = event.modifiedEvent.title.split(' (')[0];
+      
+      // Determine what changed
+      const titleChanged = origTitle !== modTitle;
+      const startChanged = new Date(event.originalEvent.start).getTime() !== new Date(event.modifiedEvent.start).getTime();
+      const endChanged = new Date(event.originalEvent.end).getTime() !== new Date(event.modifiedEvent.end).getTime();
+      
+      // Create a label that shows the changes
+      let changeLabel = '';
+      if (titleChanged) {
+        changeLabel = `${origTitle} → ${modTitle}`;
+      } else {
+        changeLabel = origTitle;
+      }
+      
+      const origStart = moment(event.originalEvent.start).format('MMM DD');
+      const modStart = moment(event.modifiedEvent.start).format('MMM DD');
+      const origEnd = moment(event.originalEvent.end).format('MMM DD');
+      const modEnd = moment(event.modifiedEvent.end).format('MMM DD');
+      
+      let dateChangeLabel = '';
+      if (startChanged && endChanged) {
+        dateChangeLabel = `${origStart}-${origEnd} → ${modStart}-${modEnd}`;
+      } else if (startChanged) {
+        dateChangeLabel = `Start: ${origStart} → ${modStart}`;
+      } else if (endChanged) {
+        dateChangeLabel = `End: ${origEnd} → ${modEnd}`;
+      }
+      
+      return (
+        <div className={className}>
+          <div className="event-split-content">
+            <div className="event-title-change">
+              {changeLabel}
+            </div>
+            {(startChanged || endChanged) && (
+              <div className="event-dates-change">
+                <span className="date-change">{dateChangeLabel}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    
+    // Default display for non-modified events
     return (
       <div className={className}>
-        <div className="event-title">{event.title}</div>
+        <div className="event-title">{event.title.split(' (')[0]}</div>
       </div>
     );
   };
@@ -289,30 +355,87 @@ const CalendarVisualDiff = ({ currentEvents, comparisonEvents, onClose }) => {
           </div>
         );
       case 'modified':
-        // For modified events, show both versions
-        return (
-          <div className="event-tooltip modified-event">
-            <div className="tooltip-title">{title}</div>
-            <div className="tooltip-section your-event">
-              <div className="tooltip-label">Your version:</div>
-              <div className="tooltip-dates">
-                {moment(event.start).format('MMM DD, YYYY')} - {moment(event.end).format('MMM DD, YYYY')}
+        // For modified events, show both versions with clear highlighting of changes
+        if (event.modifiedEvent && event.originalEvent) {
+          const origTitle = event.originalEvent.title.split(' (')[0];
+          const modTitle = event.modifiedEvent.title.split(' (')[0];
+          
+          // Determine what changed
+          const titleChanged = origTitle !== modTitle;
+          const startChanged = new Date(event.originalEvent.start).getTime() !== new Date(event.modifiedEvent.start).getTime();
+          const endChanged = new Date(event.originalEvent.end).getTime() !== new Date(event.modifiedEvent.end).getTime();
+          
+          return (
+            <div className="event-tooltip modified-event">
+              <div className="tooltip-title">
+                Modified Event: {origTitle}
               </div>
-            </div>
-            {event.modifiedEvent && (
+              
+              {titleChanged && (
+                <div className="tooltip-changes">
+                  <div className="tooltip-change-title">City Name Changed:</div>
+                  <div className="tooltip-change-row">
+                    <div className="change-from">From: <span className="highlight">{origTitle}</span></div>
+                    <div className="change-to">To: <span className="highlight">{modTitle}</span></div>
+                  </div>
+                </div>
+              )}
+              
+              {startChanged && (
+                <div className="tooltip-changes">
+                  <div className="tooltip-change-title">Start Date Changed:</div>
+                  <div className="tooltip-change-row">
+                    <div className="change-from">From: <span className="highlight">{moment(event.originalEvent.start).format('MMM DD, YYYY')}</span></div>
+                    <div className="change-to">To: <span className="highlight">{moment(event.modifiedEvent.start).format('MMM DD, YYYY')}</span></div>
+                  </div>
+                </div>
+              )}
+              
+              {endChanged && (
+                <div className="tooltip-changes">
+                  <div className="tooltip-change-title">End Date Changed:</div>
+                  <div className="tooltip-change-row">
+                    <div className="change-from">From: <span className="highlight">{moment(event.originalEvent.end).format('MMM DD, YYYY')}</span></div>
+                    <div className="change-to">To: <span className="highlight">{moment(event.modifiedEvent.end).format('MMM DD, YYYY')}</span></div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="tooltip-section your-event">
+                <div className="tooltip-label">Your version:</div>
+                <div className="tooltip-title-small">{origTitle}</div>
+                <div className="tooltip-dates">
+                  {moment(event.originalEvent.start).format('MMM DD, YYYY')} - {moment(event.originalEvent.end).format('MMM DD, YYYY')}
+                </div>
+              </div>
+              
               <div className="tooltip-section other-event">
                 <div className="tooltip-label">Other version:</div>
+                <div className="tooltip-title-small">{modTitle}</div>
                 <div className="tooltip-dates">
                   {moment(event.modifiedEvent.start).format('MMM DD, YYYY')} - {moment(event.modifiedEvent.end).format('MMM DD, YYYY')}
                 </div>
-                {event.modifiedEvent.title !== event.originalEvent.title && (
-                  <div className="tooltip-modified-title">Title: {event.modifiedEvent.title}</div>
-                )}
               </div>
-            )}
-            <div className="tooltip-type">Modified Event</div>
-          </div>
-        );
+              
+              <div className="tooltip-summary">
+                <div className="tooltip-summary-title">Summary of Changes:</div>
+                <ul className="tooltip-summary-list">
+                  {titleChanged && <li>City name changed from "{origTitle}" to "{modTitle}"</li>}
+                  {startChanged && <li>Start date moved from {moment(event.originalEvent.start).format('MMM DD, YYYY')} to {moment(event.modifiedEvent.start).format('MMM DD, YYYY')}</li>}
+                  {endChanged && <li>End date moved from {moment(event.originalEvent.end).format('MMM DD, YYYY')} to {moment(event.modifiedEvent.end).format('MMM DD, YYYY')}</li>}
+                  
+                  {startChanged || endChanged ? (
+                    <li>
+                      Duration changed from {moment(event.originalEvent.end).diff(moment(event.originalEvent.start), 'days')} days to {moment(event.modifiedEvent.end).diff(moment(event.modifiedEvent.start), 'days')} days
+                    </li>
+                  ) : null}
+                </ul>
+              </div>
+            </div>
+          );
+        }
+        return null;
+        
       case 'comparison':
         return (
           <div className="event-tooltip comparison-event">

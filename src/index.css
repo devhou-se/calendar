@@ -370,6 +370,69 @@ button.share:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: 100%;
+}
+
+/* Enhanced styling for modified events in calendar diff */
+.modified-event {
+  position: relative;
+  overflow: visible !important;
+}
+
+.event-split-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+}
+
+.event-title-change {
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 2px;
+  position: relative;
+  z-index: 10;
+  background: linear-gradient(90deg, rgba(255,235,59,0.5) 0%, rgba(255,152,0,0.5) 100%);
+  border-radius: 3px;
+  padding: 1px 3px;
+  text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.8);
+}
+
+.event-dates-change {
+  font-size: 10px;
+  font-style: italic;
+  background: rgba(33, 150, 243, 0.3);
+  border-radius: 3px;
+  padding: 1px 3px;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.date-change {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.date-change::before {
+  content: '⟳';
+  margin-right: 3px;
+  font-weight: bold;
+}
+
+/* Style for modified events with arrow indicators */
+.modified-event::before {
+  content: '↔️';
+  position: absolute;
+  right: -16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  z-index: 20;
+  text-shadow: 0px 0px 2px white;
 }
 
 .event-tooltip {
@@ -416,6 +479,119 @@ button.share:hover {
 .tooltip-modified-title {
   font-weight: bold;
   color: #FF9800;
+}
+
+/* Enhanced tooltip styles for changed events */
+.tooltip-changes {
+  background-color: rgba(255, 248, 225, 0.5);
+  border-radius: 4px;
+  padding: 8px;
+  margin: 8px 0;
+  border-left: 3px solid #FF9800;
+}
+
+.tooltip-change-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #E65100;
+}
+
+.tooltip-change-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 5px 0;
+}
+
+.change-from, .change-to {
+  padding: 3px 5px;
+  font-size: 13px;
+  border-radius: 3px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.change-from {
+  background-color: rgba(244, 67, 54, 0.1);
+  border-left: 2px solid #F44336;
+}
+
+.change-to {
+  background-color: rgba(76, 175, 80, 0.1);
+  border-left: 2px solid #4CAF50;
+}
+
+.change-from::before {
+  content: '−';
+  margin-right: 5px;
+  font-weight: bold;
+  color: #F44336;
+}
+
+.change-to::before {
+  content: '+';
+  margin-right: 5px;
+  font-weight: bold;
+  color: #4CAF50;
+}
+
+.highlight {
+  background-color: rgba(255, 235, 59, 0.3);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+/* Additional tooltip styles for enhanced diff view */
+.tooltip-title-small {
+  font-weight: bold;
+  font-size: 14px;
+  margin: 3px 0;
+}
+
+.tooltip-summary {
+  margin-top: 10px;
+  padding: 8px;
+  background-color: rgba(241, 248, 233, 0.5);
+  border-radius: 4px;
+  border-left: 3px solid #8BC34A;
+}
+
+.tooltip-summary-title {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 5px;
+  color: #33691E;
+}
+
+.tooltip-summary-list {
+  margin: 5px 0;
+  padding-left: 20px;
+  font-size: 12px;
+}
+
+.tooltip-summary-list li {
+  margin-bottom: 3px;
+  line-height: 1.4;
+}
+
+/* Animation for the modified events to draw attention */
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 87, 34, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(255, 87, 34, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 87, 34, 0);
+  }
+}
+
+.modified-event {
+  animation: pulse-border 2s infinite;
 }
 
 .your-event.tooltip-section {
