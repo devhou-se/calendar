@@ -15,7 +15,7 @@ body {
 /* Make events easier to grab and drag */
 .rbc-event {
   cursor: move !important;
-  padding: 5px 18px !important; /* Add extra padding on the sides for resize handles */
+  padding: 5px !important; 
   border-radius: 5px !important;
   font-weight: bold !important;
   position: relative !important;
@@ -24,7 +24,7 @@ body {
 /* Style for the event content to prevent overlapping with resize handles */
 .rbc-event-content {
   font-size: 14px;
-  margin: 0 10px !important;
+  padding: 0 15px !important; /* Add padding inside the content instead of the container */
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -47,30 +47,22 @@ body {
 
 /* Style the end resize handle */
 .rbc-event .rbc-addons-dnd-resize-ew-anchor-end {
-  right: -7px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
+  right: -6px !important;
 }
 
 /* Style the start resize handle */
 .rbc-event .rbc-addons-dnd-resize-ew-anchor-start {
-  left: -7px !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
+  left: -6px !important;
 }
 
 /* Style the top resize handle */
 .rbc-event .rbc-addons-dnd-resize-ns-anchor-top {
-  top: -7px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  top: -6px !important;
 }
 
 /* Style the bottom resize handle */
 .rbc-event .rbc-addons-dnd-resize-ns-anchor-bottom {
-  bottom: -7px !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
+  bottom: -6px !important;
 }
 
 /* Highlight events when hovered */

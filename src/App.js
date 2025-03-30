@@ -112,8 +112,6 @@ function App() {
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        paddingLeft: '18px',
-        paddingRight: '18px',
         minHeight: '24px',
         lineHeight: '1.2'
       }
