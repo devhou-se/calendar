@@ -28,7 +28,27 @@ const CITY_COLORS = [
 ];
 
 function App() {
-  const [events, setEvents] = useState([]);
+  // Load events from localStorage on initial render
+  const loadEventsFromStorage = () => {
+    const savedEvents = localStorage.getItem('travelCalendarEvents');
+    if (savedEvents) {
+      try {
+        // Parse the JSON string and convert date strings back to Date objects
+        const parsedEvents = JSON.parse(savedEvents).map(event => ({
+          ...event,
+          start: new Date(event.start),
+          end: new Date(event.end)
+        }));
+        return parsedEvents;
+      } catch (e) {
+        console.error('Error loading events from localStorage:', e);
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const [events, setEvents] = useState(loadEventsFromStorage);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -37,6 +57,31 @@ function App() {
   });
   const [isCreating, setIsCreating] = useState(false);
   const [cityColors, setCityColors] = useState({});
+  const [notification, setNotification] = useState(null);
+
+  // Show notification helper
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000); // Hide after 3 seconds
+  };
+
+  // Save events to localStorage whenever they change
+  useEffect(() => {
+    if (events.length > 0) {
+      try {
+        localStorage.setItem('travelCalendarEvents', JSON.stringify(events));
+        // Only show notification when events are added or modified, not on initial load
+        if (events.length && document.visibilityState === 'visible') {
+          showNotification('Calendar saved to local storage');
+        }
+      } catch (e) {
+        console.error('Error saving events to localStorage:', e);
+        showNotification('Failed to save calendar to local storage', 'error');
+      }
+    }
+  }, [events]);
 
   // Assign colors to cities
   useEffect(() => {
@@ -219,16 +264,38 @@ function App() {
     
     setEvents(updatedEvents);
   };
+  
+  // Clear all events from the calendar
+  const handleClearCalendar = () => {
+    if (window.confirm('Are you sure you want to clear all events from the calendar? This action cannot be undone.')) {
+      setEvents([]);
+      setSelectedEvent(null);
+      setIsCreating(false);
+      localStorage.removeItem('travelCalendarEvents');
+      showNotification('Calendar cleared successfully');
+    }
+  };
 
   return (
     <div className="App" style={{ padding: '20px' }}>
       <h1>Travel Calendar</h1>
       
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
+        <button onClick={handleClearCalendar} className="clear">
+          Clear Calendar
+        </button>
+        
         <button onClick={handleExportCalendar} className="export">
           Export Calendar (ICS)
         </button>
       </div>
+      
+      {/* Notification component */}
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
 
       {isCreating && (
         <div className="event-form">
