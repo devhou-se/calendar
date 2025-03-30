@@ -393,6 +393,70 @@ button.share:hover {
   border-bottom: none;
 }
 
+/* Event diff styling */
+.event-diff-pair {
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px dashed #ccc;
+}
+
+.event-diff-pair:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.event-diff {
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 5px;
+}
+
+.event-diff-label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 13px;
+}
+
+.your-event {
+  background-color: rgba(255, 152, 0, 0.1);
+  border-left: 3px solid #ff9800;
+}
+
+.other-event {
+  background-color: rgba(33, 150, 243, 0.1);
+  border-left: 3px solid #2196f3;
+}
+
+.highlight-diff {
+  background-color: #ffecb3;
+  padding: 2px 5px;
+  border-radius: 3px;
+  position: relative;
+  display: inline-block;
+}
+
+.diff-changes {
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.diff-changes span:first-child {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.change-badge {
+  background-color: #e91e63;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
 button.diff {
   background-color: #673ab7;
   padding: 10px 15px;

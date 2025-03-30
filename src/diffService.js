@@ -18,23 +18,32 @@ export const compareCalendars = (currentEvents, comparisonEvents) => {
   const removed = comparisonEvents.filter(event => !currentEventsMap.has(event.id));
   
   // Find modified events (same ID but different properties)
-  const modified = currentEvents.filter(currentEvent => {
+  const modifiedPairs = [];
+  
+  currentEvents.forEach(currentEvent => {
     const comparisonEvent = comparisonEventsMap.get(currentEvent.id);
-    if (!comparisonEvent) return false;
+    if (!comparisonEvent) return;
     
     // Check if any property is different
-    return (
+    const isModified = (
       currentEvent.title !== comparisonEvent.title ||
       new Date(currentEvent.start).getTime() !== new Date(comparisonEvent.start).getTime() ||
       new Date(currentEvent.end).getTime() !== new Date(comparisonEvent.end).getTime()
     );
+    
+    if (isModified) {
+      modifiedPairs.push({
+        current: currentEvent,
+        comparison: comparisonEvent
+      });
+    }
   });
   
   return {
     added,
     removed,
-    modified,
-    unchanged: currentEvents.length - added.length - modified.length,
+    modifiedPairs,
+    unchanged: currentEvents.length - added.length - modifiedPairs.length,
     totalCurrent: currentEvents.length,
     totalComparison: comparisonEvents.length
   };

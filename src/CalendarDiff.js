@@ -67,7 +67,7 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
             <ul className="diff-stats">
               <li><span className="added-badge">{diffResults.added.length} added</span></li>
               <li><span className="removed-badge">{diffResults.removed.length} removed</span></li>
-              <li><span className="modified-badge">{diffResults.modified.length} modified</span></li>
+              <li><span className="modified-badge">{diffResults.modifiedPairs.length} modified</span></li>
               <li><span className="unchanged-badge">{diffResults.unchanged} unchanged</span></li>
             </ul>
           </div>
@@ -90,11 +90,59 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
             </div>
           )}
 
-          {diffResults.modified.length > 0 && (
+          {diffResults.modifiedPairs && diffResults.modifiedPairs.length > 0 && (
             <div className="diff-section modified">
               <h4>Modified Events</h4>
               <div className="diff-events-list">
-                {diffResults.modified.map(renderEventDetails)}
+                {diffResults.modifiedPairs.map(pair => {
+                  // Determine what changed
+                  const titleChanged = pair.current.title !== pair.comparison.title;
+                  const startChanged = new Date(pair.current.start).getTime() !== new Date(pair.comparison.start).getTime();
+                  const endChanged = new Date(pair.current.end).getTime() !== new Date(pair.comparison.end).getTime();
+                  
+                  return (
+                    <div className="event-diff-pair" key={pair.current.id}>
+                      <div className="diff-changes">
+                        <span>Changes:</span>
+                        {titleChanged && <span className="change-badge">City Name</span>}
+                        {startChanged && <span className="change-badge">Start Date</span>}
+                        {endChanged && <span className="change-badge">End Date</span>}
+                      </div>
+                      
+                      <div className="event-diff your-event">
+                        <div className="event-diff-label">Your Event:</div>
+                        <div className="event-detail">
+                          <strong className={titleChanged ? 'highlight-diff' : ''}>{pair.current.title}</strong>
+                          <div>
+                            <span className={startChanged ? 'highlight-diff' : ''}>
+                              {moment(pair.current.start).format('MMM DD, YYYY')}
+                            </span>
+                            <span> - </span>
+                            <span className={endChanged ? 'highlight-diff' : ''}>
+                              {moment(pair.current.end).format('MMM DD, YYYY')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="event-diff other-event">
+                        <div className="event-diff-label">Other Event:</div>
+                        <div className="event-detail">
+                          <strong className={titleChanged ? 'highlight-diff' : ''}>{pair.comparison.title}</strong>
+                          <div>
+                            <span className={startChanged ? 'highlight-diff' : ''}>
+                              {moment(pair.comparison.start).format('MMM DD, YYYY')}
+                            </span>
+                            <span> - </span>
+                            <span className={endChanged ? 'highlight-diff' : ''}>
+                              {moment(pair.comparison.end).format('MMM DD, YYYY')}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
