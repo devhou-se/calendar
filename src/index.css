@@ -1,0 +1,111 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.rbc-calendar {
+  height: 700px;
+  width: 100%;
+}
+
+/* Make events easier to grab and drag */
+.rbc-event {
+  cursor: move !important;
+  padding: 5px !important;
+  border-radius: 5px !important;
+  font-weight: bold !important;
+}
+
+/* Style for the resize handle */
+.rbc-event-content {
+  font-size: 14px;
+}
+
+/* Make the event resize handles more visible and larger */
+.rbc-event .rbc-addons-dnd-resize-ns-anchor,
+.rbc-event .rbc-addons-dnd-resize-ew-anchor {
+  width: 12px !important;
+  height: 12px !important;
+  background-color: white !important;
+  border: 2px solid #333 !important;
+  border-radius: 50% !important;
+  z-index: 10 !important;
+}
+
+/* Style the end resize handle */
+.rbc-event .rbc-addons-dnd-resize-ew-anchor-end {
+  right: -6px !important;
+}
+
+/* Style the start resize handle */
+.rbc-event .rbc-addons-dnd-resize-ew-anchor-start {
+  left: -6px !important;
+}
+
+/* Style the top resize handle */
+.rbc-event .rbc-addons-dnd-resize-ns-anchor-top {
+  top: -6px !important;
+}
+
+/* Style the bottom resize handle */
+.rbc-event .rbc-addons-dnd-resize-ns-anchor-bottom {
+  bottom: -6px !important;
+}
+
+/* Highlight events when hovered */
+.rbc-event:hover {
+  opacity: 0.9 !important;
+  transform: scale(1.02);
+  transition: transform 0.1s ease-in-out;
+  z-index: 1000 !important;
+}
+
+.event-form {
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.event-form h2 {
+  margin-top: 0;
+}
+
+.event-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.event-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.event-form button {
+  padding: 10px 15px;
+  margin-right: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.event-form button.cancel {
+  background-color: #f44336;
+}
+
+.event-form button.export {
+  background-color: #2196F3;
+}
+
+.event-form button:hover {
+  opacity: 0.8;
+}
