@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { compareCalendars, loadEventsFromURL } from './diffService';
 import moment from 'moment';
+import CalendarVisualDiff from './CalendarVisualDiff';
 
 const CalendarDiff = ({ currentEvents, onClose }) => {
   const [comparisonUrl, setComparisonUrl] = useState('');
   const [diffResults, setDiffResults] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showVisualDiff, setShowVisualDiff] = useState(false);
+  const [comparisonEvents, setComparisonEvents] = useState([]);
 
   const handleCompare = async () => {
     if (!comparisonUrl) {
@@ -18,12 +21,14 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
     setError(null);
     
     try {
-      const comparisonEvents = await loadEventsFromURL(comparisonUrl);
-      const results = compareCalendars(currentEvents, comparisonEvents);
+      const loadedComparisonEvents = await loadEventsFromURL(comparisonUrl);
+      setComparisonEvents(loadedComparisonEvents);
+      const results = compareCalendars(currentEvents, loadedComparisonEvents);
       setDiffResults(results);
     } catch (err) {
       setError(`Error loading comparison calendar: ${err.message}`);
       setDiffResults(null);
+      setComparisonEvents([]);
     } finally {
       setIsLoading(false);
     }
@@ -37,6 +42,17 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
       </div>
     </div>
   );
+
+  // If visual diff is active, show that instead
+  if (showVisualDiff && comparisonEvents.length > 0) {
+    return (
+      <CalendarVisualDiff
+        currentEvents={currentEvents}
+        comparisonEvents={comparisonEvents}
+        onClose={() => setShowVisualDiff(false)}
+      />
+    );
+  }
 
   return (
     <div className="calendar-diff">
@@ -149,7 +165,18 @@ const CalendarDiff = ({ currentEvents, onClose }) => {
         </div>
       )}
 
-      <button onClick={onClose} className="close-button">Close</button>
+      {diffResults && (
+        <div className="diff-view-buttons">
+          <button 
+            onClick={() => setShowVisualDiff(true)} 
+            className="visual-diff-button"
+            disabled={!comparisonEvents || comparisonEvents.length === 0}
+          >
+            Show Calendar View
+          </button>
+          <button onClick={onClose} className="close-button">Close</button>
+        </div>
+      )}
     </div>
   );
 };
