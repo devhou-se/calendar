@@ -243,12 +243,42 @@ function App() {
               required
             />
             
-            <div>
-              <p>Date Range: {moment(newEvent.start).format('MMM DD, YYYY')} - {moment(newEvent.end).format('MMM DD, YYYY')}</p>
+            <div className="date-inputs">
+              <div className="date-field">
+                <label>Start Date:</label>
+                <input 
+                  type="date" 
+                  value={moment(newEvent.start).format('YYYY-MM-DD')} 
+                  onChange={(e) => {
+                    const newDate = moment(e.target.value).toDate();
+                    setNewEvent({
+                      ...newEvent, 
+                      start: newDate
+                    });
+                  }}
+                />
+              </div>
+              
+              <div className="date-field">
+                <label>End Date:</label>
+                <input 
+                  type="date" 
+                  value={moment(newEvent.end).format('YYYY-MM-DD')} 
+                  onChange={(e) => {
+                    const newDate = moment(e.target.value).toDate();
+                    setNewEvent({
+                      ...newEvent, 
+                      end: newDate
+                    });
+                  }}
+                />
+              </div>
             </div>
             
-            <button type="submit">Save</button>
-            <button type="button" className="cancel" onClick={() => setIsCreating(false)}>Cancel</button>
+            <div className="form-actions">
+              <button type="submit">Save</button>
+              <button type="button" className="cancel" onClick={() => setIsCreating(false)}>Cancel</button>
+            </div>
           </form>
         </div>
       )}
@@ -266,13 +296,43 @@ function App() {
               required
             />
             
-            <div>
-              <p>Date Range: {moment(selectedEvent.start).format('MMM DD, YYYY')} - {moment(selectedEvent.end).format('MMM DD, YYYY')}</p>
+            <div className="date-inputs">
+              <div className="date-field">
+                <label>Start Date:</label>
+                <input 
+                  type="date" 
+                  value={moment(selectedEvent.start).format('YYYY-MM-DD')} 
+                  onChange={(e) => {
+                    const newDate = moment(e.target.value).toDate();
+                    setSelectedEvent({
+                      ...selectedEvent, 
+                      start: newDate
+                    });
+                  }}
+                />
+              </div>
+              
+              <div className="date-field">
+                <label>End Date:</label>
+                <input 
+                  type="date" 
+                  value={moment(selectedEvent.end).format('YYYY-MM-DD')} 
+                  onChange={(e) => {
+                    const newDate = moment(e.target.value).toDate();
+                    setSelectedEvent({
+                      ...selectedEvent, 
+                      end: newDate
+                    });
+                  }}
+                />
+              </div>
             </div>
             
-            <button type="submit">Update</button>
-            <button type="button" onClick={() => setSelectedEvent(null)} className="cancel">Cancel</button>
-            <button type="button" onClick={handleDeleteEvent} className="cancel">Delete</button>
+            <div className="form-actions">
+              <button type="submit">Update</button>
+              <button type="button" onClick={() => setSelectedEvent(null)} className="cancel">Cancel</button>
+              <button type="button" onClick={handleDeleteEvent} className="cancel">Delete</button>
+            </div>
           </form>
         </div>
       )}
