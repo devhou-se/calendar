@@ -6,6 +6,8 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { useSearchParams } from 'react-router-dom';
 import { generateCalendarPreview, updateMetaTags } from './previewService';
+import { encodeEventsToURL, decodeEventsFromURL } from './encodingService';
+import CalendarDiff from './CalendarDiff';
 
 // Create a DnD Calendar
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -29,42 +31,7 @@ const CITY_COLORS = [
   '#2EC4B6', // Turquoise
 ];
 
-// Functions for URL encoding/decoding
-const encodeEventsToURL = (events) => {
-  if (!events || events.length === 0) return '';
-  
-  // Convert dates to ISO strings before serializing
-  const serializedEvents = events.map(event => ({
-    ...event,
-    start: event.start ? event.start.toISOString() : null,
-    end: event.end ? event.end.toISOString() : null
-  }));
-  
-  // Serialize to JSON and compress
-  const jsonString = JSON.stringify(serializedEvents);
-  // Use Base64 encoding for URL safety, but also handle special chars
-  return btoa(encodeURIComponent(jsonString));
-};
-
-const decodeEventsFromURL = (encodedData) => {
-  if (!encodedData) return [];
-  
-  try {
-    // Decode Base64 and URL encoding
-    const jsonString = decodeURIComponent(atob(encodedData));
-    const parsedEvents = JSON.parse(jsonString);
-    
-    // Convert ISO strings back to Date objects
-    return parsedEvents.map(event => ({
-      ...event,
-      start: event.start ? new Date(event.start) : null,
-      end: event.end ? new Date(event.end) : null
-    }));
-  } catch (e) {
-    console.error('Error decoding events from URL:', e);
-    return [];
-  }
-};
+// Encoding/decoding functions moved to encodingService.js
 
 function App() {
   // Setup URL parameters
@@ -73,6 +40,8 @@ function App() {
   const [currentDate, setCurrentDate] = useState(new Date());
   // Ref for the calendar element (used for preview generation)
   const calendarRef = useRef(null);
+  // State for diff modal
+  const [showDiffModal, setShowDiffModal] = useState(false);
   
   // Load events from URL or localStorage on initial render
   const loadInitialEvents = () => {
@@ -438,6 +407,10 @@ function App() {
           <button onClick={handleClearCalendar} className="clear">
             Clear Calendar
           </button>
+          
+          <button onClick={() => setShowDiffModal(true)} className="diff" style={{ marginLeft: '10px' }}>
+            Compare Calendars
+          </button>
         </div>
         
         <div>
@@ -450,6 +423,14 @@ function App() {
           </button>
         </div>
       </div>
+      
+      {/* Calendar Diff Modal */}
+      {showDiffModal && (
+        <CalendarDiff 
+          currentEvents={events} 
+          onClose={() => setShowDiffModal(false)} 
+        />
+      )}
       
       {/* Notification component */}
       {notification && (

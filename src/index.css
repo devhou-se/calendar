@@ -241,3 +241,164 @@ button.share:hover {
     opacity: 0;
   }
 }
+
+/* Calendar Diff Styles */
+.calendar-diff {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  z-index: 2000;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.diff-input {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.diff-url-input {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.compare-button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.compare-button:hover {
+  background-color: #0b7dda;
+}
+
+.compare-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.close-button {
+  margin-top: 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 15px;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.diff-error {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border-left: 4px solid #d32f2f;
+}
+
+.diff-summary {
+  background-color: #f5f5f5;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.diff-stats {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.diff-stats li {
+  margin: 0;
+}
+
+.added-badge, .removed-badge, .modified-badge, .unchanged-badge {
+  padding: 5px 10px;
+  border-radius: 15px;
+  color: white;
+  font-weight: 500;
+}
+
+.added-badge {
+  background-color: #4caf50;
+}
+
+.removed-badge {
+  background-color: #f44336;
+}
+
+.modified-badge {
+  background-color: #ff9800;
+}
+
+.unchanged-badge {
+  background-color: #2196f3;
+}
+
+.diff-section {
+  margin-bottom: 20px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.diff-section h4 {
+  padding: 10px 15px;
+  margin: 0;
+  color: white;
+}
+
+.diff-section.added h4 {
+  background-color: #4caf50;
+}
+
+.diff-section.removed h4 {
+  background-color: #f44336;
+}
+
+.diff-section.modified h4 {
+  background-color: #ff9800;
+}
+
+.diff-events-list {
+  padding: 15px;
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.event-detail {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.event-detail:last-child {
+  border-bottom: none;
+}
+
+button.diff {
+  background-color: #673ab7;
+  padding: 10px 15px;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+}
