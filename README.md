@@ -4,7 +4,7 @@ A web application that lets you create and manage your travel itinerary on a cal
 
 ## Live Demo
 
-Check out the live app at [https://devhou-se.github.io/calendar](https://devhou-se.github.io/calendar)
+Check out the live app at [https://calendar.devhou.se](https://calendar.devhou.se)
 
 ## Features
 
