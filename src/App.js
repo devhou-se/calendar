@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import { generateCalendarPreview, updateMetaTags } from './previewService';
 import { encodeEventsToURL, decodeEventsFromURL } from './encodingService';
 import CalendarDiff from './CalendarDiff';
+import { prepareEventForCalendar, validateDateRange, parseDateString, formatDateForInput } from './dateUtils';
 
 // Create a DnD Calendar
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -60,8 +61,8 @@ function App() {
           // Parse the JSON string and convert date strings back to Date objects
           loadedEvents = JSON.parse(savedEvents).map(event => ({
             ...event,
-            start: new Date(event.start),
-            end: new Date(event.end)
+            start: event.start ? new Date(event.start) : null,
+            end: event.end ? new Date(event.end) : null
           }));
         } catch (e) {
           console.error('Error loading events from localStorage:', e);
@@ -192,31 +193,32 @@ function App() {
 
   // Handle slot selection (dragging across calendar to create a new event)
   const handleSelectSlot = ({ start, end }) => {
-    // For react-big-calendar, the end date is exclusive, so we need to adjust
-    // for correct display in the form (which assumes inclusive end dates)
-    const adjustedEnd = new Date(end);
-    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+    // react-big-calendar gives us an exclusive end date
+    // Convert to inclusive for our internal representation
+    const inclusiveEnd = new Date(end);
+    
+    // For multi-day selections, adjust to inclusive
+    if (start.getTime() !== end.getTime()) {
+      inclusiveEnd.setDate(inclusiveEnd.getDate() - 1);
+    }
     
     setNewEvent({
       title: '',
       start,
-      end: adjustedEnd
+      end: inclusiveEnd
     });
     setIsCreating(true);
   };
 
   // Handle event selection (clicking on an existing event)
   const handleSelectEvent = (event) => {
-    // For react-big-calendar, end dates are exclusive
-    // When displaying in a form, we want to show the inclusive end date (the day before)
-    const displayEvent = { ...event };
-    
-    // Adjust the end date for form display (subtract one day)
-    const adjustedEnd = new Date(event.end);
-    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
-    displayEvent.end = adjustedEnd;
-    
-    setSelectedEvent(displayEvent);
+    // Find the original event from our state (which has inclusive dates)
+    const originalEvent = events.find(e => e.id === event.id);
+    if (originalEvent) {
+      setSelectedEvent(originalEvent);
+    } else {
+      setSelectedEvent(event);
+    }
     setIsCreating(false);
   };
 
@@ -228,17 +230,18 @@ function App() {
       return;
     }
 
-    // For react-big-calendar, end dates are exclusive, not inclusive
-    // We need to adjust the end date to be the day after what the user selected
-    const adjustedEnd = new Date(newEvent.end);
-    adjustedEnd.setDate(adjustedEnd.getDate() + 1);
+    if (!validateDateRange(newEvent.start, newEvent.end)) {
+      alert('End date must be on or after the start date');
+      return;
+    }
 
+    // Store event with inclusive dates
     const event = {
       id: Date.now(),
       title: newEvent.title,
       start: newEvent.start,
-      end: adjustedEnd,
-      allDay: true // Make event all-day for better dragging UX
+      end: newEvent.end, // Already inclusive from form
+      allDay: true
     };
 
     setEvents([...events, event]);
@@ -254,18 +257,14 @@ function App() {
       return;
     }
 
-    // For react-big-calendar, end dates are exclusive, not inclusive
-    // Adjust the end date for display in the calendar
-    const adjustedEvent = { ...selectedEvent };
-    
-    // We need to add a day to the end date for the calendar view
-    // This assumes the form is showing an inclusive end date
-    const adjustedEnd = new Date(selectedEvent.end);
-    adjustedEnd.setDate(adjustedEnd.getDate() + 1);
-    adjustedEvent.end = adjustedEnd;
+    if (!validateDateRange(selectedEvent.start, selectedEvent.end)) {
+      alert('End date must be on or after the start date');
+      return;
+    }
 
+    // Store event with inclusive dates
     const updatedEvents = events.map(event => 
-      event.id === selectedEvent.id ? adjustedEvent : event
+      event.id === selectedEvent.id ? selectedEvent : event
     );
     setEvents(updatedEvents);
     setSelectedEvent(null);
@@ -297,7 +296,10 @@ function App() {
     // Add each event
     events.forEach(event => {
       const startDateFormatted = moment(event.start).format('YYYYMMDD[T]HHmmss');
-      const endDateFormatted = moment(event.end).format('YYYYMMDD[T]HHmmss');
+      // ICS format expects exclusive end dates, so add one day to our inclusive end date
+      const exclusiveEnd = new Date(event.end);
+      exclusiveEnd.setDate(exclusiveEnd.getDate() + 1);
+      const endDateFormatted = moment(exclusiveEnd).format('YYYYMMDD[T]HHmmss');
       
       icsContent = [
         ...icsContent,
@@ -334,48 +336,31 @@ function App() {
 
   // Handle drag and drop of events
   const moveEvent = ({ event, start, end }) => {
-    // Ensure we're working with dates
-    const startDate = new Date(start);
+    // Convert exclusive end date from calendar back to inclusive for storage
+    const inclusiveEnd = new Date(end);
+    if (start.getTime() !== end.getTime()) {
+      inclusiveEnd.setDate(inclusiveEnd.getDate() - 1);
+    }
     
-    // For react-big-calendar, when displaying all-day events
-    // the end date is exclusive, so we need to adjust when displaying in the form
-    // Calendar returns the day after (exclusive end), so we're good here - no adjustment needed
-    const endDate = new Date(end);
-    
-    const updatedEvents = events.map(existingEvent => {
-      return existingEvent.id === event.id 
-        ? { 
-            ...existingEvent, 
-            start: startDate, 
-            end: endDate,
-            allDay: true // Ensure the event remains all-day for consistent dragging
-          }
+    const updatedEvents = events.map((existingEvent) => {
+      return existingEvent.id === event.id
+        ? { ...existingEvent, start: new Date(start), end: inclusiveEnd, allDay: true }
         : existingEvent;
     });
-    
     setEvents(updatedEvents);
   };
   
   // Handle resizing events (updating start or end date)
   const resizeEvent = ({ event, start, end }) => {
-    const startDate = new Date(start);
+    // Convert exclusive end date from calendar back to inclusive for storage
+    const inclusiveEnd = new Date(end);
+    inclusiveEnd.setDate(inclusiveEnd.getDate() - 1);
     
-    // For react-big-calendar, when displaying all-day events
-    // the end date is exclusive, so the default behavior is correct here
-    // (the calendar already provides the day after the visual end as the actual end date)
-    const endDate = new Date(end);
-    
-    const updatedEvents = events.map(existingEvent => {
-      return existingEvent.id === event.id 
-        ? { 
-            ...existingEvent, 
-            start: startDate, 
-            end: endDate,
-            allDay: true // Ensure the event remains all-day for consistent dragging
-          }
+    const updatedEvents = events.map((existingEvent) => {
+      return existingEvent.id === event.id
+        ? { ...existingEvent, start: new Date(start), end: inclusiveEnd, allDay: true }
         : existingEvent;
     });
-    
     setEvents(updatedEvents);
   };
   
@@ -494,9 +479,9 @@ function App() {
                 <label>Start Date:</label>
                 <input 
                   type="date" 
-                  value={moment(newEvent.start).format('YYYY-MM-DD')} 
+                  value={formatDateForInput(newEvent.start)} 
                   onChange={(e) => {
-                    const newDate = moment(e.target.value).toDate();
+                    const newDate = parseDateString(e.target.value);
                     setNewEvent({
                       ...newEvent, 
                       start: newDate
@@ -509,9 +494,9 @@ function App() {
                 <label>End Date:</label>
                 <input 
                   type="date" 
-                  value={moment(newEvent.end).format('YYYY-MM-DD')} 
+                  value={formatDateForInput(newEvent.end)} 
                   onChange={(e) => {
-                    const newDate = moment(e.target.value).toDate();
+                    const newDate = parseDateString(e.target.value);
                     setNewEvent({
                       ...newEvent, 
                       end: newDate
@@ -547,9 +532,9 @@ function App() {
                 <label>Start Date:</label>
                 <input 
                   type="date" 
-                  value={moment(selectedEvent.start).format('YYYY-MM-DD')} 
+                  value={formatDateForInput(selectedEvent.start)} 
                   onChange={(e) => {
-                    const newDate = moment(e.target.value).toDate();
+                    const newDate = parseDateString(e.target.value);
                     setSelectedEvent({
                       ...selectedEvent, 
                       start: newDate
@@ -562,9 +547,9 @@ function App() {
                 <label>End Date:</label>
                 <input 
                   type="date" 
-                  value={moment(selectedEvent.end).format('YYYY-MM-DD')} 
+                  value={formatDateForInput(selectedEvent.end)} 
                   onChange={(e) => {
-                    const newDate = moment(e.target.value).toDate();
+                    const newDate = parseDateString(e.target.value);
                     setSelectedEvent({
                       ...selectedEvent, 
                       end: newDate
@@ -586,7 +571,7 @@ function App() {
       <div ref={calendarRef}>
         <DnDCalendar
           localizer={localizer}
-          events={events}
+          events={events.map(prepareEventForCalendar)}
           startAccessor="start"
           endAccessor="end"
           selectable

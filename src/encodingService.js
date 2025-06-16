@@ -1,4 +1,5 @@
 // Functions for URL encoding/decoding
+import { dateToDaysSinceEpoch, daysSinceEpochToDate } from './dateUtils';
 
 // Base64URL encoding (URL-safe base64)
 const toBase64URL = (str) => {
@@ -31,8 +32,8 @@ export const encodeEventsToURL = (events) => {
     // Format: [i,t,s,e] where i=id, t=title, s=start days, e=end days
     const minimalEvents = events.map(event => {
       // Convert dates to Unix timestamps (in days since Jan 1, 1970)
-      const s = event.start ? Math.floor(event.start.getTime() / 86400000) : 0;
-      const e = event.end ? Math.floor(event.end.getTime() / 86400000) : 0;
+      const s = dateToDaysSinceEpoch(event.start);
+      const e = dateToDaysSinceEpoch(event.end);
       
       return {
         i: event.id,
@@ -47,8 +48,8 @@ export const encodeEventsToURL = (events) => {
   } else {
     // Maintain v2 format for existing URLs (backward compatibility)
     const compactEvents = events.map(event => {
-      const startTime = event.start ? Math.floor(event.start.getTime() / 86400000) : 0;
-      const endTime = event.end ? Math.floor(event.end.getTime() / 86400000) : 0;
+      const startTime = dateToDaysSinceEpoch(event.start);
+      const endTime = dateToDaysSinceEpoch(event.end);
       
       return [
         event.id,
@@ -79,8 +80,8 @@ export const decodeEventsFromURL = (encodedData) => {
         return {
           id: evt.i,
           title: evt.t,
-          start: new Date(evt.s * 86400000),
-          end: new Date(evt.e * 86400000),
+          start: daysSinceEpochToDate(evt.s),
+          end: daysSinceEpochToDate(evt.e),
           allDay: true
         };
       });
@@ -93,8 +94,8 @@ export const decodeEventsFromURL = (encodedData) => {
         const [id, encodedTitle, startTime, endTime] = eventStr.split(',');
         
         // Convert timestamps back to Date objects
-        const start = new Date(parseInt(startTime) * 86400000);
-        const end = new Date(parseInt(endTime) * 86400000);
+        const start = daysSinceEpochToDate(parseInt(startTime));
+        const end = daysSinceEpochToDate(parseInt(endTime));
         
         return {
           id: parseInt(id),
