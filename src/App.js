@@ -382,6 +382,42 @@ function App() {
     }
   };
   
+  // Load devhouse dates
+  const handleLoadDevhouseDates = () => {
+    if (window.confirm('Are you sure you want to load the devhouse dates? This will replace all existing calendar data.')) {
+      const devhouseDates = [
+        {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true},
+        {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true},
+        {"id":1743312059372,"title":"Dealer's choice","start":"2025-10-31T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true},
+        {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true},
+        {"id":1743312070472,"title":"Osaka","start":"2025-11-11T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true},
+        {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true},
+        {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true}
+      ];
+      
+      // Convert date strings to Date objects
+      const formattedEvents = devhouseDates.map(event => ({
+        ...event,
+        start: new Date(event.start),
+        end: new Date(event.end)
+      }));
+      
+      setEvents(formattedEvents);
+      setSelectedEvent(null);
+      setIsCreating(false);
+      
+      // Set the calendar view to show the earliest date
+      const earliestDate = formattedEvents.reduce((earliest, event) => {
+        const eventStart = new Date(event.start);
+        return eventStart < earliest ? eventStart : earliest;
+      }, new Date(formattedEvents[0].start));
+      
+      setCurrentDate(earliestDate);
+      
+      showNotification('Devhouse dates loaded successfully');
+    }
+  };
+  
   // Generate sharable link with current calendar data
   const handleShareLink = async () => {
     try {
@@ -432,6 +468,10 @@ function App() {
           
           <button onClick={() => setShowDiffModal(true)} className="diff" style={{ marginLeft: '10px' }}>
             Compare Calendars
+          </button>
+          
+          <button onClick={handleLoadDevhouseDates} className="load-devhouse" style={{ marginLeft: '10px' }}>
+            Load devhouse dates
           </button>
         </div>
         
