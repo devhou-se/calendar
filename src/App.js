@@ -70,16 +70,8 @@ function App() {
       }
     }
     
-    // If we have events, find earliest date and set current view to that month
-    if (loadedEvents.length > 0) {
-      const earliestDate = loadedEvents.reduce((earliest, event) => {
-        const eventStart = new Date(event.start);
-        return eventStart < earliest ? eventStart : earliest;
-      }, new Date(loadedEvents[0].start));
-      
-      // Set the calendar to show the month of the earliest event
-      setCurrentDate(earliestDate);
-    }
+    // Always set calendar to show November 2025 by default
+    setCurrentDate(new Date(2025, 10, 1)); // November is month 10 (0-indexed)
     
     return loadedEvents;
   };
