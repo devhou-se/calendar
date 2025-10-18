@@ -3,7 +3,6 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { decodeEventsFromURL } from './encodingService';
 import { prepareEventForCalendar } from './dateUtils';
 
 // Setup the localizer for react-big-calendar
