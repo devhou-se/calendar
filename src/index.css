@@ -1040,3 +1040,45 @@ button.load-devhouse {
 .rbc-off-range.rbc-today {
   background-color: rgba(255, 235, 59, 0.1) !important;
 }
+
+/* DevHouse View - Taller cells to show up to 5 events */
+.devhouse-view .rbc-calendar {
+  height: 660px !important;
+}
+
+.devhouse-view .rbc-month-row {
+  min-height: 160px !important;
+}
+
+.devhouse-view .rbc-day-bg {
+  min-height: 160px !important;
+}
+
+.devhouse-view .rbc-event {
+  font-size: 11px !important;
+  padding: 4px 6px !important;
+  margin-bottom: 1px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  cursor: default !important;
+}
+
+.devhouse-view .rbc-event-content {
+  font-size: 11px !important;
+  text-align: left !important;
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+/* Disable hover effects on devhouse view events */
+.devhouse-view .rbc-event:hover {
+  opacity: 1 !important;
+  transform: none !important;
+  z-index: auto !important;
+}
+
+/* Hide weeks after Nov 22 (hide last 2 week rows) */
+.devhouse-view .rbc-month-view .rbc-month-row:nth-last-child(-n+2) {
+  display: none !important;
+}
