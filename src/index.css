@@ -1029,3 +1029,14 @@ button.load-devhouse {
   cursor: pointer;
   font-size: 15px;
 }
+
+/* Today indicator styling */
+.rbc-today {
+  background-color: rgba(255, 235, 59, 0.2) !important;
+  border: 2px solid #FFC107 !important;
+  box-shadow: inset 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+.rbc-off-range.rbc-today {
+  background-color: rgba(255, 235, 59, 0.1) !important;
+}

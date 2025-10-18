@@ -40,8 +40,16 @@ export const toInclusiveEndDate = (endDate) => {
 
 // Prepare event for react-big-calendar (convert to exclusive end date)
 export const prepareEventForCalendar = (event) => {
+  let displayTitle = event.title;
+
+  // Format dealer's choice events with emoji and attendees
+  if (event.type === 'dealers-choice' && event.attendees && event.attendees.length > 0) {
+    displayTitle = `🎲 ${event.title} (${event.attendees.join(', ')})`;
+  }
+
   return {
     ...event,
+    title: displayTitle,
     end: toExclusiveEndDate(event.end)
   };
 };

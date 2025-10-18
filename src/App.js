@@ -378,36 +378,44 @@ function App() {
   const handleLoadDevhouseDates = () => {
     if (window.confirm('Are you sure you want to load the devhouse dates? This will replace all existing calendar data.')) {
       const devhouseDates = [
-        {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true},
-        {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true},
-        {"id":1743312059372,"title":"Dealer's choice","start":"2025-10-31T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true},
-        {"id":1757817735690,"title":"Kanazawa (popular Dealer's choice)","start":"2025-11-04T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true},
-        {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true},
-        {"id":1757817492179,"title":"Okayama","start":"2025-11-11T13:00:00.000Z","end":"2025-11-12T13:00:00.000Z","allDay":true},
-        {"id":1743312070472,"title":"Osaka","start":"2025-11-12T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true},
-        {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true},
-        {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true}
+        // Core events
+        {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true,"type":"core"},
+        {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true,"type":"core"},
+        {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true,"type":"core"},
+        {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true,"type":"core"},
+        {"id":1757817492179,"title":"Okayama","start":"2025-11-11T13:00:00.000Z","end":"2025-11-12T13:00:00.000Z","allDay":true,"type":"core"},
+        {"id":1743312070472,"title":"Osaka","start":"2025-11-12T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core"},
+        {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core"},
+
+        // Dealer's choice events
+        {"id":1700000001,"title":"Karuizawa","start":"2025-11-01T13:00:00.000Z","end":"2025-11-02T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
+        {"id":1700000002,"title":"Osaka","start":"2025-11-01T13:00:00.000Z","end":"2025-11-02T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+        {"id":1700000003,"title":"Tokyo","start":"2025-11-01T13:00:00.000Z","end":"2025-11-05T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","VB","YV"]},
+        {"id":1700000004,"title":"Otsu","start":"2025-11-02T13:00:00.000Z","end":"2025-11-03T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+        {"id":1700000005,"title":"Toyama","start":"2025-11-02T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
+        {"id":1700000006,"title":"Higashiomi","start":"2025-11-03T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+        {"id":1700000007,"title":"Nagahama","start":"2025-11-04T13:00:00.000Z","end":"2025-11-05T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+        {"id":1700000008,"title":"Shirakawa-Go","start":"2025-11-04T13:00:00.000Z","end":"2025-11-05T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
+        {"id":1700000009,"title":"Kanazawa","start":"2025-11-05T13:00:00.000Z","end":"2025-11-08T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","DT","JG","YV"]},
+        {"id":1700000010,"title":"Tsuruga","start":"2025-11-05T13:00:00.000Z","end":"2025-11-06T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+        {"id":1700000011,"title":"Takashima","start":"2025-11-06T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+        {"id":1700000012,"title":"Otsu","start":"2025-11-07T13:00:00.000Z","end":"2025-11-08T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]}
       ];
-      
+
       // Convert date strings to Date objects
       const formattedEvents = devhouseDates.map(event => ({
         ...event,
         start: new Date(event.start),
         end: new Date(event.end)
       }));
-      
+
       setEvents(formattedEvents);
       setSelectedEvent(null);
       setIsCreating(false);
-      
-      // Set the calendar view to show the earliest date
-      const earliestDate = formattedEvents.reduce((earliest, event) => {
-        const eventStart = new Date(event.start);
-        return eventStart < earliest ? eventStart : earliest;
-      }, new Date(formattedEvents[0].start));
-      
-      setCurrentDate(earliestDate);
-      
+
+      // Always snap to November 2025
+      setCurrentDate(new Date(2025, 10, 1)); // November is month 10 (0-indexed)
+
       showNotification('Devhouse dates loaded successfully');
     }
   };
@@ -428,10 +436,10 @@ function App() {
             console.error('Error generating preview for sharing:', err);
           }
         }
-        
+
         // Create full URL with encoded data
         const shareableUrl = `${window.location.origin}${window.location.pathname}?data=${encodedData}`;
-        
+
         // Copy to clipboard
         navigator.clipboard.writeText(shareableUrl)
           .then(() => {
@@ -448,6 +456,90 @@ function App() {
       console.error('Error generating share link:', e);
       showNotification('Error generating share link', 'error');
     }
+  };
+
+  // Member information
+  const MEMBERS = [
+    { name: 'Bailey', initials: 'BB' },
+    { name: 'Damian', initials: 'DT' },
+    { name: 'Dylan', initials: 'DB' },
+    { name: 'Julia', initials: 'JG' },
+    { name: 'Vyv', initials: 'VB' },
+    { name: 'Yashuk', initials: 'YV' }
+  ];
+
+  // Get current time in JST (UTC+9)
+  const getCurrentJSTTime = () => {
+    const now = new Date();
+    // Convert to JST by adding 9 hours to UTC
+    const jstOffset = 9 * 60; // JST is UTC+9
+    const localOffset = now.getTimezoneOffset(); // Local offset from UTC in minutes (negative for ahead of UTC)
+    const jstTime = new Date(now.getTime() + (jstOffset + localOffset) * 60 * 1000);
+    return jstTime;
+  };
+
+  // Get current location for a member
+  const getCurrentLocation = (memberInitials) => {
+    const jstNow = getCurrentJSTTime();
+    const jstHour = jstNow.getHours();
+
+    // Get all dealer's choice events for this member
+    const memberEvents = events
+      .filter(event =>
+        event.type === 'dealers-choice' &&
+        event.attendees &&
+        event.attendees.includes(memberInitials)
+      )
+      .sort((a, b) => a.start - b.start);
+
+    if (memberEvents.length === 0) {
+      return null;
+    }
+
+    // Find the event(s) the member is in today
+    const todayStart = new Date(jstNow);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(jstNow);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Find events that overlap with today
+    const currentEvents = memberEvents.filter(event => {
+      const eventStart = new Date(event.start);
+      const eventEnd = new Date(event.end);
+      eventStart.setHours(0, 0, 0, 0);
+      eventEnd.setHours(23, 59, 59, 999);
+
+      return eventStart <= todayEnd && eventEnd >= todayStart;
+    });
+
+    if (currentEvents.length === 0) {
+      return null;
+    }
+
+    // If there are multiple events today (transitioning), apply the 10am rule
+    if (currentEvents.length > 1) {
+      // Sort by start time
+      currentEvents.sort((a, b) => a.start - b.start);
+
+      // Before 10am JST: show the earlier location
+      // After 10am JST: show the later location
+      if (jstHour < 10) {
+        return currentEvents[0].title;
+      } else {
+        return currentEvents[currentEvents.length - 1].title;
+      }
+    }
+
+    // Only one event today
+    return currentEvents[0].title;
+  };
+
+  // Get current locations for all members
+  const getCurrentLocations = () => {
+    return MEMBERS.map(member => ({
+      ...member,
+      location: getCurrentLocation(member.initials)
+    })).filter(member => member.location !== null);
   };
 
   return (
@@ -628,6 +720,50 @@ function App() {
           onNavigate={date => setCurrentDate(date)}
         />
       </div>
+
+      {/* Current Location Tracker */}
+      {events.length > 0 && events.some(e => e.type === 'dealers-choice') && (
+        <div style={{
+          marginTop: '30px',
+          padding: '20px',
+          backgroundColor: '#f5f5f5',
+          borderRadius: '8px',
+          border: '1px solid #ddd'
+        }}>
+          <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#333' }}>
+            Current Locations (JST Time: {getCurrentJSTTime().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' })})
+          </h3>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+            gap: '10px'
+          }}>
+            {getCurrentLocations().map(member => (
+              <div key={member.initials} style={{
+                padding: '10px 15px',
+                backgroundColor: 'white',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <span style={{ fontWeight: 'bold', color: '#2196F3' }}>
+                  {member.name} ({member.initials}):
+                </span>
+                <span style={{ color: '#666' }}>
+                  {member.location}
+                </span>
+              </div>
+            ))}
+            {getCurrentLocations().length === 0 && (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '20px' }}>
+                No members are currently at dealer's choice locations
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
