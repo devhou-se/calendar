@@ -10,32 +10,25 @@ import DateLocationModal from './DateLocationModal';
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
 
-// Define a set of colors for events
-const CITY_COLORS = [
-  '#FF6B6B', // Red
-  '#4ECDC4', // Teal
-  '#FF9F1C', // Orange
-  '#6A0572', // Purple
-  '#1A936F', // Green
-  '#3D5A80', // Navy
-  '#E84855', // Coral
-  '#3185FC', // Blue
-  '#FFBF69', // Yellow
-  '#7D4E57', // Mauve
-  '#3C91E6', // Bright Blue
-  '#2EC4B6', // Turquoise
-];
+// Define colors for event types (darker for better text readability)
+const EVENT_COLORS = {
+  'core': '#00897B',          // Darker teal for core events with attendees
+  'dealers-choice': '#F57C00', // Darker orange for dealer's choice
+  'other': '#8E24AA'           // Darker purple for other events (Land, Leave, custom)
+};
 
 // Devhouse dates
 const DEVHOUSE_DATES = [
-  // Core events
-  {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true,"type":"core"},
+  // Core events with attendees
   {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
   {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","GG","JG","VB","YV"]},
   {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
   {"id":1757817492179,"title":"Okayama","start":"2025-11-11T13:00:00.000Z","end":"2025-11-12T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
   {"id":1743312070472,"title":"Osaka","start":"2025-11-12T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
-  {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core"},
+
+  // Other events (no attendees)
+  {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true,"type":"other"},
+  {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"other"},
 
   // Dealer's choice events
   {"id":1700000001,"title":"Karuizawa","start":"2025-10-31T13:00:00.000Z","end":"2025-11-01T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
@@ -193,7 +186,6 @@ function DevhouseView() {
   };
 
   const [events] = useState(loadInitialEvents);
-  const [cityColors, setCityColors] = useState({});
   const [currentDate] = useState(new Date(2025, 10, 1)); // November 2025
   const [selectedAttendees, setSelectedAttendees] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -253,31 +245,16 @@ function DevhouseView() {
     setSelectedDate(null);
   };
 
-  // Assign colors to cities
-  useEffect(() => {
-    const cities = {};
-    let colorIndex = 0;
-
-    events.forEach(event => {
-      if (!cities[event.title]) {
-        cities[event.title] = CITY_COLORS[colorIndex % CITY_COLORS.length];
-        colorIndex++;
-      }
-    });
-
-    setCityColors(cities);
-  }, [events]);
-
-  // Function to get event style based on city
+  // Function to get event style based on type
   const eventStyleGetter = (event) => {
-    const backgroundColor = cityColors[event.title] || '#3174ad';
+    const backgroundColor = EVENT_COLORS[event.type] || EVENT_COLORS['other'];
     return {
       style: {
         backgroundColor,
-        borderRadius: '5px',
-        opacity: 0.8,
+        borderRadius: '0',
+        opacity: 0.9,
         color: 'white',
-        border: '0px',
+        border: '2px solid rgba(0, 0, 0, 0.3)',
         display: 'block',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -295,8 +272,9 @@ function DevhouseView() {
     if (isToday) {
       return {
         style: {
-          backgroundColor: '#fff3cd',
-          border: '2px solid #ffc107'
+          backgroundColor: 'rgba(255, 0, 0, 0.1)',
+          border: '2px solid #FF0000',
+          boxShadow: 'inset 0 0 10px rgba(255, 0, 0, 0.3)'
         }
       };
     }
@@ -372,7 +350,14 @@ function DevhouseView() {
 
   return (
     <div className="App devhouse-view" style={{ padding: '20px' }}>
-      <h1>devhouse calendar</h1>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+        <img
+          src="/logo-white.svg"
+          alt="devhouse logo"
+          style={{ height: '60px', filter: 'drop-shadow(0 0 5px rgba(255, 0, 0, 0.3))' }}
+        />
+        <h1 style={{ margin: 0 }}>calendar</h1>
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -380,14 +365,15 @@ function DevhouseView() {
           <button
             onClick={() => setSelectedAttendees([])}
             style={{
-              padding: '6px 12px',
-              borderRadius: '20px',
-              border: selectedAttendees.length === 0 ? '2px solid #2196F3' : '1px solid #ccc',
-              backgroundColor: selectedAttendees.length === 0 ? '#2196F3' : 'white',
-              color: selectedAttendees.length === 0 ? 'white' : '#333',
+              padding: '8px 16px',
+              borderRadius: '0',
+              border: selectedAttendees.length === 0 ? '2px solid #FF0000' : '2px solid #333333',
+              backgroundColor: selectedAttendees.length === 0 ? '#FF0000' : '#1a1a1a',
+              color: selectedAttendees.length === 0 ? 'white' : '#ffffff',
               cursor: 'pointer',
               fontSize: '13px',
-              fontWeight: selectedAttendees.length === 0 ? 'bold' : 'normal'
+              fontWeight: selectedAttendees.length === 0 ? 'bold' : 'normal',
+              transition: 'all 0.2s'
             }}
           >
             All
@@ -397,14 +383,15 @@ function DevhouseView() {
               key={member.initials}
               onClick={() => toggleAttendee(member.initials)}
               style={{
-                padding: '6px 12px',
-                borderRadius: '20px',
-                border: selectedAttendees.includes(member.initials) ? '2px solid #2196F3' : '1px solid #ccc',
-                backgroundColor: selectedAttendees.includes(member.initials) ? '#2196F3' : 'white',
-                color: selectedAttendees.includes(member.initials) ? 'white' : '#333',
+                padding: '8px 16px',
+                borderRadius: '0',
+                border: selectedAttendees.includes(member.initials) ? '2px solid #FF0000' : '2px solid #333333',
+                backgroundColor: selectedAttendees.includes(member.initials) ? '#FF0000' : '#1a1a1a',
+                color: selectedAttendees.includes(member.initials) ? 'white' : '#ffffff',
                 cursor: 'pointer',
                 fontSize: '13px',
-                fontWeight: selectedAttendees.includes(member.initials) ? 'bold' : 'normal'
+                fontWeight: selectedAttendees.includes(member.initials) ? 'bold' : 'normal',
+                transition: 'all 0.2s'
               }}
             >
               {member.name}
@@ -440,12 +427,13 @@ function DevhouseView() {
       {/* Current Location Tracker */}
       <div style={{
         marginTop: '30px',
-        padding: '20px',
-        backgroundColor: '#f5f5f5',
-        borderRadius: '8px',
-        border: '1px solid #ddd'
+        padding: '15px',
+        backgroundColor: '#1a1a1a',
+        borderRadius: '0',
+        border: '2px solid #333333',
+        boxShadow: '0 0 10px rgba(255, 0, 0, 0.1)'
       }}>
-        <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#333' }}>
+        <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#FF0000', fontSize: '14px' }}>
           Current Locations
         </h3>
         {getTodayLocations().length > 0 ? (
@@ -457,9 +445,10 @@ function DevhouseView() {
             {getTodayLocations().map((item, index) => (
               <div key={index} style={{
                 padding: '12px 15px',
-                backgroundColor: 'white',
-                borderRadius: '5px',
-                border: '1px solid #ccc'
+                backgroundColor: '#0a0a0a',
+                borderRadius: '0',
+                border: '2px solid #333333',
+                boxShadow: '0 0 5px rgba(255, 0, 0, 0.1)'
               }}>
                 <div style={{
                   display: 'flex',
@@ -467,10 +456,10 @@ function DevhouseView() {
                   alignItems: 'center',
                   marginBottom: '8px'
                 }}>
-                  <span style={{ fontWeight: 'bold', color: '#2196F3', fontSize: '15px' }}>
+                  <span style={{ fontWeight: 'bold', color: '#FF0000', fontSize: '15px' }}>
                     {getGroupDisplayName(item)}
                   </span>
-                  <span style={{ color: '#666', fontSize: '13px' }}>
+                  <span style={{ color: '#cccccc', fontSize: '13px' }}>
                     {item.count} {item.count === 1 ? 'person' : 'people'}
                   </span>
                 </div>
@@ -481,7 +470,7 @@ function DevhouseView() {
                   paddingLeft: '10px'
                 }}>
                   {item.attendees.map((name, idx) => (
-                    <span key={idx} style={{ color: '#555', fontSize: '14px' }}>
+                    <span key={idx} style={{ color: '#dddddd', fontSize: '14px' }}>
                       • {name}
                     </span>
                   ))}

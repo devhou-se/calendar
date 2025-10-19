@@ -1,10 +1,27 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', 'Hiragino Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Press Start 2P', cursive;
+  color: #FF0000;
+  letter-spacing: 1px;
+}
+
+/* Selection styling */
+::selection {
+  background-color: #FF0000;
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background-color: #FF0000;
+  color: #ffffff;
 }
 
 .rbc-calendar {
@@ -15,10 +32,11 @@ body {
 /* Make events easier to grab and drag */
 .rbc-event {
   cursor: move !important;
-  padding: 5px !important; 
-  border-radius: 5px !important;
+  padding: 5px !important;
+  border-radius: 0 !important;
   font-weight: bold !important;
   position: relative !important;
+  border: 2px solid rgba(0, 0, 0, 0.3) !important;
 }
 
 /* Style for the event content to prevent overlapping with resize handles */
@@ -37,11 +55,11 @@ body {
 .rbc-event .rbc-addons-dnd-resize-ew-anchor {
   width: 14px !important;
   height: 14px !important;
-  background-color: white !important;
-  border: 2px solid #333 !important;
-  border-radius: 50% !important;
+  background-color: #FF0000 !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 0 !important;
   z-index: 20 !important; /* Higher z-index to ensure handles are on top */
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 0 4px rgba(255, 0, 0, 0.5) !important;
   position: absolute !important;
 }
 
@@ -69,8 +87,9 @@ body {
 .rbc-event:hover {
   opacity: 0.9 !important;
   transform: scale(1.02);
-  transition: transform 0.1s ease-in-out;
+  transition: transform 0.2s ease-in-out;
   z-index: 1000 !important;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5) !important;
 }
 
 /* Enhance resize handles on hover */
@@ -78,15 +97,17 @@ body {
 .rbc-event:hover .rbc-addons-dnd-resize-ew-anchor {
   width: 16px !important;
   height: 16px !important;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5) !important;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8) !important;
   transition: all 0.2s ease-in-out !important;
 }
 
 .event-form {
-  padding: 20px;
+  padding: 15px;
   margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 2px solid #333333;
+  border-radius: 0;
+  background-color: #1a1a1a;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.1);
 }
 
 .event-form h2 {
@@ -102,8 +123,17 @@ body {
   width: 100%;
   padding: 8px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid #333333;
+  border-radius: 0;
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.event-form input:focus {
+  outline: none;
+  border-color: #FF0000;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
 }
 
 /* Style for date inputs */
@@ -127,9 +157,17 @@ body {
 .date-field input[type="date"] {
   width: 100%;
   padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid #333333;
+  border-radius: 0;
   font-size: 16px;
+  background-color: #0a0a0a;
+  color: #ffffff;
+}
+
+.date-field input[type="date"]:focus {
+  outline: none;
+  border-color: #FF0000;
+  box-shadow: 0 0 8px rgba(255, 0, 0, 0.5);
 }
 
 .form-actions {
@@ -142,60 +180,76 @@ body {
   padding: 10px 15px;
   margin-right: 10px;
   margin-bottom: 10px;
-  background-color: #4CAF50;
+  background-color: #FF0000;
   color: white;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #FF0000;
+  border-radius: 0;
   cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .event-form button.cancel {
-  background-color: #f44336;
+  background-color: #333333;
+  border-color: #666666;
 }
 
 .event-form button.export {
-  background-color: #2196F3;
+  background-color: #FF0000;
+  border-color: #FF0000;
 }
 
 button.export {
-  background-color: #2196F3;
+  background-color: #FF0000;
   padding: 10px 15px;
   color: white;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #FF0000;
+  border-radius: 0;
   cursor: pointer;
   font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 button.clear {
-  background-color: #F44336;
+  background-color: #333333;
   padding: 10px 15px;
   color: white;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #666666;
+  border-radius: 0;
   cursor: pointer;
   font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 button.share {
-  background-color: #4CAF50;
+  background-color: #FF0000;
   padding: 10px 15px;
   color: white;
-  border: none;
-  border-radius: 4px;
+  border: 2px solid #FF0000;
+  border-radius: 0;
   cursor: pointer;
   font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
 .event-form button:hover,
 button.export:hover,
-button.clear:hover,
 button.share:hover,
 button.diff:hover,
 button.load-devhouse:hover {
-  opacity: 0.8;
+  background-color: #cc0000;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
   transform: translateY(-1px);
-  transition: all 0.1s ease;
+}
+
+button.clear:hover,
+.event-form button.cancel:hover {
+  background-color: #1a1a1a;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 
 /* Notification styles */
@@ -204,24 +258,28 @@ button.load-devhouse:hover {
   top: 20px;
   right: 20px;
   padding: 12px 20px;
-  border-radius: 4px;
+  border-radius: 0;
   color: white;
   font-weight: 500;
   z-index: 1000;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+  border: 2px solid;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
   animation: slideIn 0.3s ease-out forwards, fadeOut 0.5s ease-out 2.5s forwards;
 }
 
 .notification.success {
-  background-color: #4caf50;
+  background-color: #FF0000;
+  border-color: #cc0000;
 }
 
 .notification.error {
-  background-color: #f44336;
+  background-color: #333333;
+  border-color: #666666;
 }
 
 .notification.info {
-  background-color: #2196f3;
+  background-color: #FF0000;
+  border-color: #cc0000;
 }
 
 @keyframes slideIn {
@@ -251,28 +309,30 @@ button.load-devhouse:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.98);
+  background-color: rgba(10, 10, 10, 0.98);
   z-index: 2000;
   padding: 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  color: #ffffff;
 }
 
 /* Visual Diff specific styles */
 .calendar-container {
   margin-bottom: 20px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border: 2px solid #333333;
+  border-radius: 0;
   overflow: hidden;
+  background-color: #1a1a1a;
 }
 
 .diff-toolbar {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e0e0e0;
+  background-color: #1a1a1a;
+  border-bottom: 2px solid #333333;
 }
 
 .diff-toolbar-navigation {
@@ -281,16 +341,16 @@ button.load-devhouse:hover {
 }
 
 .diff-toolbar-navigation button {
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #1a1a1a;
+  border: 2px solid #333333;
   padding: 5px 10px;
   margin-right: 5px;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
 }
 
 .diff-toolbar-navigation button:hover {
-  background-color: #f0f0f0;
+  background-color: #1a1a1a;
 }
 
 .diff-toolbar-label {
@@ -312,36 +372,36 @@ button.load-devhouse:hover {
 }
 
 .diff-view-toggle button {
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #1a1a1a;
+  border: 2px solid #333333;
   padding: 5px 10px;
   margin-right: 5px;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
 }
 
 .diff-view-toggle button:hover {
-  background-color: #f0f0f0;
+  background-color: #1a1a1a;
 }
 
 .diff-view-toggle button.active {
-  background-color: #2196F3;
+  background-color: #FF0000;
   color: white;
-  border-color: #2196F3;
+  border-color: #FF0000;
 }
 
 .diff-toolbar-navigation button.active {
-  background-color: #2196F3;
+  background-color: #FF0000;
   color: white;
-  border-color: #2196F3;
+  border-color: #FF0000;
 }
 
 .diff-legend {
   margin-bottom: 15px;
   padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  background-color: #1a1a1a;
+  border: 2px solid #333333;
+  border-radius: 0;
 }
 
 .legend-title {
@@ -363,7 +423,7 @@ button.load-devhouse:hover {
 .legend-color {
   width: 20px;
   height: 20px;
-  border-radius: 4px;
+  border-radius: 0;
   margin-right: 8px;
 }
 
@@ -390,7 +450,7 @@ button.load-devhouse:hover {
   justify-content: space-between;
   min-height: 100%;
   background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .event-side {
@@ -404,14 +464,14 @@ button.load-devhouse:hover {
 
 .event-side.original {
   background-color: rgba(76, 175, 80, 0.15);
-  border-radius: 3px 0 0 3px;
+  border-radius: 0 0 0 3px;
   border-right: 1px dashed #4CAF50;
 }
 
 .event-side.modified {
   background-color: rgba(33, 150, 243, 0.15);
   border-radius: 0 3px 3px 0;
-  border-left: 1px dashed #2196F3;
+  border-left: 1px dashed #FF0000;
 }
 
 .event-side-title {
@@ -420,12 +480,12 @@ button.load-devhouse:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #333;
+  color: #ffffff;
 }
 
 .event-side-dates {
   font-size: 10px;
-  color: #666;
+  color: #cccccc;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -468,8 +528,8 @@ button.load-devhouse:hover {
 
 .event-tooltip {
   padding: 10px;
-  background-color: white;
-  border-radius: 4px;
+  background-color: #1a1a1a;
+  border-radius: 0;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   min-width: 200px;
   max-width: 400px;
@@ -492,7 +552,7 @@ button.load-devhouse:hover {
 .tooltip-section {
   margin-bottom: 8px;
   padding: 5px;
-  border-radius: 4px;
+  border-radius: 0;
 }
 
 .tooltip-label {
@@ -520,7 +580,7 @@ button.load-devhouse:hover {
 /* Enhanced tooltip styles for changed events */
 .tooltip-changes {
   background-color: rgba(255, 248, 225, 0.5);
-  border-radius: 4px;
+  border-radius: 0;
   padding: 8px;
   margin: 8px 0;
   border-left: 3px solid #FF9800;
@@ -543,7 +603,7 @@ button.load-devhouse:hover {
 .change-from, .change-to {
   padding: 3px 5px;
   font-size: 13px;
-  border-radius: 3px;
+  border-radius: 0;
   position: relative;
   display: flex;
   align-items: center;
@@ -576,7 +636,7 @@ button.load-devhouse:hover {
 .highlight {
   background-color: rgba(255, 235, 59, 0.3);
   padding: 2px 4px;
-  border-radius: 3px;
+  border-radius: 0;
   font-weight: bold;
 }
 
@@ -591,7 +651,7 @@ button.load-devhouse:hover {
   margin-top: 15px;
   margin-bottom: 15px;
   background-color: rgba(255, 255, 255, 0.85);
-  border-radius: 5px;
+  border-radius: 0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
@@ -628,7 +688,7 @@ button.load-devhouse:hover {
 }
 
 .event-box-header {
-  background-color: #f5f5f5;
+  background-color: #1a1a1a;
   padding: 8px;
   font-weight: bold;
   font-size: 13px;
@@ -684,7 +744,7 @@ button.load-devhouse:hover {
 
 .date-label, .duration-label {
   font-weight: 500;
-  color: #666;
+  color: #cccccc;
 }
 
 .event-comparison-arrows {
@@ -703,7 +763,7 @@ button.load-devhouse:hover {
   height: 24px;
   background-color: #FF5722;
   color: white;
-  border-radius: 50%;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -716,7 +776,7 @@ button.load-devhouse:hover {
   margin-top: 10px;
   padding: 8px;
   background-color: rgba(241, 248, 233, 0.5);
-  border-radius: 4px;
+  border-radius: 0;
   border-left: 3px solid #8BC34A;
 }
 
@@ -776,7 +836,7 @@ button.load-devhouse:hover {
 }
 
 .event-tooltip.comparison-event {
-  border-left: 4px solid #2196F3;
+  border-left: 4px solid #FF0000;
 }
 
 .diff-controls, .diff-view-buttons {
@@ -790,7 +850,7 @@ button.load-devhouse:hover {
   background-color: #9C27B0;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   padding: 10px 15px;
   cursor: pointer;
   font-size: 15px;
@@ -819,16 +879,16 @@ button.load-devhouse:hover {
   flex: 1;
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid #333333;
+  border-radius: 0;
   margin-right: 10px;
 }
 
 .compare-button {
-  background-color: #2196F3;
+  background-color: #FF0000;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   padding: 10px 15px;
   cursor: pointer;
   font-size: 16px;
@@ -848,7 +908,7 @@ button.load-devhouse:hover {
   background-color: #f44336;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   padding: 10px 15px;
   cursor: pointer;
   align-self: flex-end;
@@ -858,15 +918,15 @@ button.load-devhouse:hover {
   background-color: #ffebee;
   color: #d32f2f;
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 0;
   margin-bottom: 20px;
   border-left: 4px solid #d32f2f;
 }
 
 .diff-summary {
-  background-color: #f5f5f5;
+  background-color: #1a1a1a;
   padding: 15px;
-  border-radius: 4px;
+  border-radius: 0;
   margin-bottom: 20px;
 }
 
@@ -884,7 +944,7 @@ button.load-devhouse:hover {
 
 .added-badge, .removed-badge, .modified-badge, .unchanged-badge {
   padding: 5px 10px;
-  border-radius: 15px;
+  border-radius: 0;
   color: white;
   font-weight: 500;
 }
@@ -902,12 +962,12 @@ button.load-devhouse:hover {
 }
 
 .unchanged-badge {
-  background-color: #2196f3;
+  background-color: #FF0000;
 }
 
 .diff-section {
   margin-bottom: 20px;
-  border-radius: 4px;
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -931,8 +991,8 @@ button.load-devhouse:hover {
 
 .diff-events-list {
   padding: 15px;
-  background-color: white;
-  border: 1px solid #e0e0e0;
+  background-color: #1a1a1a;
+  border: 2px solid #333333;
   max-height: 200px;
   overflow-y: auto;
 }
@@ -960,7 +1020,7 @@ button.load-devhouse:hover {
 
 .event-diff {
   padding: 10px;
-  border-radius: 4px;
+  border-radius: 0;
   margin-bottom: 5px;
 }
 
@@ -977,13 +1037,13 @@ button.load-devhouse:hover {
 
 .other-event {
   background-color: rgba(33, 150, 243, 0.1);
-  border-left: 3px solid #2196f3;
+  border-left: 3px solid #FF0000;
 }
 
 .highlight-diff {
   background-color: #ffecb3;
   padding: 2px 5px;
-  border-radius: 3px;
+  border-radius: 0;
   position: relative;
   display: inline-block;
 }
@@ -1005,7 +1065,7 @@ button.load-devhouse:hover {
   background-color: #e91e63;
   color: white;
   padding: 3px 8px;
-  border-radius: 12px;
+  border-radius: 0;
   font-size: 12px;
   font-weight: 500;
 }
@@ -1015,7 +1075,7 @@ button.diff {
   padding: 10px 15px;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
   font-size: 15px;
 }
@@ -1025,7 +1085,7 @@ button.load-devhouse {
   padding: 10px 15px;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
   font-size: 15px;
 }
@@ -1039,6 +1099,11 @@ button.load-devhouse {
 
 .rbc-off-range.rbc-today {
   background-color: rgba(255, 235, 59, 0.1) !important;
+}
+
+/* Match off-range (October) dates with secondary background */
+.rbc-off-range-bg {
+  background-color: #1a1a1a !important;
 }
 
 /* DevHouse View - Taller cells to show up to 5 events */
@@ -1107,11 +1172,11 @@ button.load-devhouse {
 }
 
 .event-detail-modal {
-  background-color: white;
+  background-color: #1a1a1a;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
-  border-radius: 20px 20px 0 0;
+  border-radius: 0 20px 0 0;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
   animation: slideUp 0.3s ease-out;
   max-height: 80vh;
@@ -1132,20 +1197,20 @@ button.load-devhouse {
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 2px solid #333333;
 }
 
 .event-detail-header h2 {
   margin: 0;
   font-size: 20px;
-  color: #333;
+  color: #ffffff;
 }
 
 .event-detail-close {
   background: none;
   border: none;
   font-size: 28px;
-  color: #666;
+  color: #cccccc;
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -1153,19 +1218,19 @@ button.load-devhouse {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 0;
   transition: background-color 0.2s ease;
 }
 
 .event-detail-close:hover {
-  background-color: #f0f0f0;
+  background-color: #1a1a1a;
 }
 
 .date-nav-arrow {
   background: none;
   border: none;
   font-size: 24px;
-  color: #666;
+  color: #cccccc;
   cursor: pointer;
   padding: 0;
   width: 36px;
@@ -1173,12 +1238,12 @@ button.load-devhouse {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 0;
   transition: background-color 0.2s ease;
 }
 
 .date-nav-arrow:hover {
-  background-color: #f0f0f0;
+  background-color: #1a1a1a;
 }
 
 .date-nav-arrow:disabled {
@@ -1206,7 +1271,7 @@ button.load-devhouse {
   display: block;
   font-weight: 600;
   font-size: 13px;
-  color: #666;
+  color: #cccccc;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 8px;
@@ -1214,17 +1279,17 @@ button.load-devhouse {
 
 .event-detail-value {
   font-size: 18px;
-  color: #333;
+  color: #ffffff;
   padding: 12px 16px;
-  background-color: #f8f8f8;
-  border-radius: 8px;
-  border-left: 3px solid #2196F3;
+  background-color: #1a1a1a;
+  border-radius: 0;
+  border-left: 3px solid #FF0000;
 }
 
 /* Mobile responsiveness */
 @media (max-width: 600px) {
   .event-detail-modal {
-    border-radius: 16px 16px 0 0;
+    border-radius: 0 16px 0 0;
   }
 
   .event-detail-header {
@@ -1262,15 +1327,15 @@ button.load-devhouse {
   cursor: pointer;
   transition: background-color 0.2s ease;
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(33, 150, 243, 0.2);
+  -webkit-tap-highlight-color: rgba(255, 0, 0, 0.2);
 }
 
 .devhouse-view .rbc-day-bg:hover {
-  background-color: rgba(33, 150, 243, 0.08) !important;
+  background-color: rgba(255, 0, 0, 0.08) !important;
 }
 
 .devhouse-view .rbc-day-bg:active {
-  background-color: rgba(33, 150, 243, 0.15) !important;
+  background-color: rgba(255, 0, 0, 0.15) !important;
 }
 
 /* Highlight effect for the current month dates */
@@ -1279,7 +1344,7 @@ button.load-devhouse {
 }
 
 .devhouse-view .rbc-off-range .rbc-day-bg:hover {
-  background-color: rgba(33, 150, 243, 0.04) !important;
+  background-color: rgba(255, 0, 0, 0.04) !important;
 }
 
 /* Date Location Modal Styles */
@@ -1294,10 +1359,10 @@ button.load-devhouse {
 }
 
 .location-group {
-  background-color: #f8f8f8;
-  border-radius: 12px;
+  background-color: #1a1a1a;
+  border-radius: 0;
   padding: 16px;
-  border-left: 4px solid #2196F3;
+  border-left: 4px solid #FF0000;
 }
 
 .location-header {
@@ -1312,16 +1377,16 @@ button.load-devhouse {
 .location-name {
   font-size: 18px;
   font-weight: 700;
-  color: #333;
+  color: #ffffff;
 }
 
 .location-count {
   font-size: 14px;
   font-weight: 600;
-  color: #2196F3;
+  color: #FF0000;
   background-color: rgba(33, 150, 243, 0.1);
   padding: 4px 12px;
-  border-radius: 12px;
+  border-radius: 0;
 }
 
 .location-attendees {
@@ -1332,7 +1397,7 @@ button.load-devhouse {
 
 .attendee-item {
   font-size: 16px;
-  color: #555;
+  color: #dddddd;
   padding: 4px 0;
 }
 

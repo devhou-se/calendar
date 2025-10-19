@@ -16,21 +16,12 @@ const DnDCalendar = withDragAndDrop(Calendar);
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
 
-// Define a set of colors for events
-const CITY_COLORS = [
-  '#FF6B6B', // Red
-  '#4ECDC4', // Teal
-  '#FF9F1C', // Orange
-  '#6A0572', // Purple
-  '#1A936F', // Green
-  '#3D5A80', // Navy
-  '#E84855', // Coral
-  '#3185FC', // Blue
-  '#FFBF69', // Yellow
-  '#7D4E57', // Mauve
-  '#3C91E6', // Bright Blue
-  '#2EC4B6', // Turquoise
-];
+// Define colors for event types (darker for better text readability)
+const EVENT_COLORS = {
+  'core': '#00897B',          // Darker teal for core events with attendees
+  'dealers-choice': '#F57C00', // Darker orange for dealer's choice
+  'other': '#8E24AA'           // Darker purple for other events (Land, Leave, custom)
+};
 
 // Encoding/decoding functions moved to encodingService.js
 
@@ -85,7 +76,6 @@ function EditorView() {
     end: null
   });
   const [isCreating, setIsCreating] = useState(false);
-  const [cityColors, setCityColors] = useState({});
   const [notification, setNotification] = useState(null);
 
   // Show notification helper
@@ -125,21 +115,6 @@ function EditorView() {
     }
   }, [events, searchParams, setSearchParams]);
 
-  // Assign colors to cities
-  useEffect(() => {
-    const cities = {};
-    let colorIndex = 0;
-
-    events.forEach(event => {
-      if (!cities[event.title]) {
-        cities[event.title] = CITY_COLORS[colorIndex % CITY_COLORS.length];
-        colorIndex++;
-      }
-    });
-
-    setCityColors(cities);
-  }, [events]);
-
   // Generate preview image for social sharing when events change
   useEffect(() => {
     // Wait for the calendar to be rendered and stable
@@ -164,16 +139,16 @@ function EditorView() {
     generatePreview();
   }, [events]);
 
-  // Function to get event style based on city
+  // Function to get event style based on type
   const eventStyleGetter = (event) => {
-    const backgroundColor = cityColors[event.title] || '#3174ad';
+    const backgroundColor = EVENT_COLORS[event.type] || EVENT_COLORS['other'];
     return {
       style: {
         backgroundColor,
-        borderRadius: '5px',
-        opacity: 0.8,
+        borderRadius: '0',
+        opacity: 0.9,
         color: 'white',
-        border: '0px',
+        border: '2px solid rgba(0, 0, 0, 0.3)',
         display: 'block',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
@@ -234,7 +209,8 @@ function EditorView() {
       title: newEvent.title,
       start: newEvent.start,
       end: newEvent.end, // Already inclusive from form
-      allDay: true
+      allDay: true,
+      type: 'other' // Default type for custom events
     };
 
     setEvents([...events, event]);
@@ -550,7 +526,14 @@ function EditorView() {
 
   return (
     <div className="App" style={{ padding: '20px' }}>
-      <h1>Travel Calendar</h1>
+      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
+        <img
+          src="/logo-white.svg"
+          alt="devhouse logo"
+          style={{ height: '60px', filter: 'drop-shadow(0 0 5px rgba(255, 0, 0, 0.3))' }}
+        />
+        <h1 style={{ margin: 0 }}>calendar</h1>
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
         <div>
@@ -735,12 +718,13 @@ function EditorView() {
       {events.length > 0 && events.some(e => e.type === 'dealers-choice') && (
         <div style={{
           marginTop: '30px',
-          padding: '20px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          border: '1px solid #ddd'
+          padding: '15px',
+          backgroundColor: '#1a1a1a',
+          borderRadius: '0',
+          border: '2px solid #333333',
+          boxShadow: '0 0 10px rgba(255, 0, 0, 0.1)'
         }}>
-          <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#333' }}>
+          <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#FF0000', fontSize: '14px' }}>
             Current Locations (JST Time: {getCurrentJSTTime().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' })})
           </h3>
           <div style={{
@@ -751,17 +735,17 @@ function EditorView() {
             {getCurrentLocations().map(member => (
               <div key={member.initials} style={{
                 padding: '10px 15px',
-                backgroundColor: 'white',
-                borderRadius: '5px',
-                border: '1px solid #ccc',
+                backgroundColor: '#0a0a0a',
+                borderRadius: '0',
+                border: '2px solid #333333',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
-                <span style={{ fontWeight: 'bold', color: '#2196F3' }}>
+                <span style={{ fontWeight: 'bold', color: '#FF0000' }}>
                   {member.name} ({member.initials}):
                 </span>
-                <span style={{ color: '#666' }}>
+                <span style={{ color: '#cccccc' }}>
                   {member.location}
                 </span>
               </div>

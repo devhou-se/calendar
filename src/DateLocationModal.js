@@ -133,7 +133,7 @@ const DateLocationModal = ({ date, events, members, onClose }) => {
           >
             ←
           </button>
-          <h2>Locations for {formatDate(currentDate)}</h2>
+          <h2>{formatDate(currentDate)}</h2>
           <button
             className="date-nav-arrow"
             onClick={handleNextDay}
