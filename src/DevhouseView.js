@@ -4,6 +4,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { prepareEventForCalendar } from './dateUtils';
+import EventDetailModal from './EventDetailModal';
 
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
@@ -28,23 +29,23 @@ const CITY_COLORS = [
 const DEVHOUSE_DATES = [
   // Core events
   {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true,"type":"core"},
-  {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true,"type":"core"},
-  {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true,"type":"core"},
-  {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true,"type":"core"},
-  {"id":1757817492179,"title":"Okayama","start":"2025-11-11T13:00:00.000Z","end":"2025-11-12T13:00:00.000Z","allDay":true,"type":"core"},
-  {"id":1743312070472,"title":"Osaka","start":"2025-11-12T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core"},
+  {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
+  {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","GG","JG","VB","YV"]},
+  {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
+  {"id":1757817492179,"title":"Okayama","start":"2025-11-11T13:00:00.000Z","end":"2025-11-12T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
+  {"id":1743312070472,"title":"Osaka","start":"2025-11-12T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
   {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core"},
 
   // Dealer's choice events
   {"id":1700000001,"title":"Karuizawa","start":"2025-10-31T13:00:00.000Z","end":"2025-11-01T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
   {"id":1700000002,"title":"Osaka","start":"2025-10-31T13:00:00.000Z","end":"2025-11-01T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000003,"title":"Tokyo","start":"2025-10-31T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","VB","YV"]},
+  {"id":1700000003,"title":"Tokyo","start":"2025-10-31T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","GG","VB","YV"]},
   {"id":1700000004,"title":"Otsu","start":"2025-11-01T13:00:00.000Z","end":"2025-11-02T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
   {"id":1700000005,"title":"Toyama","start":"2025-11-01T13:00:00.000Z","end":"2025-11-03T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
   {"id":1700000006,"title":"Higashiomi","start":"2025-11-02T13:00:00.000Z","end":"2025-11-03T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
   {"id":1700000007,"title":"Nagahama","start":"2025-11-03T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
   {"id":1700000008,"title":"Shirakawa-Go","start":"2025-11-03T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000009,"title":"Kanazawa","start":"2025-11-04T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","DT","JG","YV"]},
+  {"id":1700000009,"title":"Kanazawa","start":"2025-11-04T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","DT","GG","JG","YV"]},
   {"id":1700000010,"title":"Tsuruga","start":"2025-11-04T13:00:00.000Z","end":"2025-11-05T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
   {"id":1700000011,"title":"Takashima","start":"2025-11-05T13:00:00.000Z","end":"2025-11-06T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
   {"id":1700000012,"title":"Otsu","start":"2025-11-06T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]}
@@ -76,12 +77,15 @@ function DevhouseView() {
   const [cityColors, setCityColors] = useState({});
   const [currentDate] = useState(new Date(2025, 10, 1)); // November 2025
   const [selectedAttendees, setSelectedAttendees] = useState([]);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showEventModal, setShowEventModal] = useState(false);
 
   // Member information
   const MEMBERS = [
     { name: 'Bailey', initials: 'BB' },
     { name: 'Damian', initials: 'DT' },
     { name: 'Dylan', initials: 'DB' },
+    { name: 'Gloria', initials: 'GG' },
     { name: 'Julia', initials: 'JG' },
     { name: 'Vyv', initials: 'VB' },
     { name: 'Yashuk', initials: 'YV' }
@@ -118,6 +122,18 @@ function DevhouseView() {
         ? prev.filter(a => a !== initials)
         : [...prev, initials]
     );
+  };
+
+  // Handle event selection
+  const handleSelectEvent = (event) => {
+    setSelectedEvent(event);
+    setShowEventModal(true);
+  };
+
+  // Handle modal close
+  const handleCloseModal = () => {
+    setShowEventModal(false);
+    setSelectedEvent(null);
   };
 
   // Assign colors to cities
@@ -352,6 +368,7 @@ function DevhouseView() {
           drilldownView={null}
           date={currentDate}
           onNavigate={() => {}} // Disable navigation
+          onSelectEvent={handleSelectEvent}
         />
       </div>
 
@@ -397,6 +414,15 @@ function DevhouseView() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Event Detail Modal */}
+      {showEventModal && selectedEvent && (
+        <EventDetailModal
+          event={selectedEvent}
+          onClose={handleCloseModal}
+          members={MEMBERS}
+        />
       )}
     </div>
   );

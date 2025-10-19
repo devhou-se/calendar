@@ -1082,3 +1082,147 @@ button.load-devhouse {
 .devhouse-view .rbc-month-view .rbc-month-row:nth-last-child(-n+2) {
   display: none !important;
 }
+
+/* Event Detail Modal - Bottom Sheet */
+.event-detail-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 3000;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeInBackdrop 0.3s ease-out;
+}
+
+@keyframes fadeInBackdrop {
+  from {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  to {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.event-detail-modal {
+  background-color: white;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.3s ease-out;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.event-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.event-detail-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.event-detail-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.event-detail-close:hover {
+  background-color: #f0f0f0;
+}
+
+.event-detail-content {
+  padding: 24px;
+}
+
+.event-detail-field {
+  margin-bottom: 20px;
+}
+
+.event-detail-field:last-child {
+  margin-bottom: 0;
+}
+
+.event-detail-field label {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.event-detail-value {
+  font-size: 18px;
+  color: #333;
+  padding: 12px 16px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  border-left: 3px solid #2196F3;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .event-detail-modal {
+    border-radius: 16px 16px 0 0;
+  }
+
+  .event-detail-header {
+    padding: 16px 20px;
+  }
+
+  .event-detail-header h2 {
+    font-size: 18px;
+  }
+
+  .event-detail-content {
+    padding: 20px;
+  }
+
+  .event-detail-value {
+    font-size: 16px;
+    padding: 10px 14px;
+  }
+}
+
+/* Enable pointer events on calendar events in DevhouseView */
+.devhouse-view .rbc-event {
+  cursor: pointer !important;
+}
+
+.devhouse-view .rbc-event:hover {
+  opacity: 0.85 !important;
+  transform: scale(1.01) !important;
+  transition: all 0.15s ease !important;
+}
