@@ -215,13 +215,11 @@ function DevhouseView() {
     const filtered = selectedAttendees.length === 0
       ? events
       : events.filter(event => {
-          // Always show core events
-          if (event.type === 'core') return true;
-          // Show dealer's choice events only if they include selected attendees
-          if (event.type === 'dealers-choice' && event.attendees) {
+          // Show events only if they include selected attendees
+          if (event.attendees && event.attendees.length > 0) {
             return event.attendees.some(attendee => selectedAttendees.includes(attendee));
           }
-          return true;
+          return false;
         });
 
     // Sort so dealer's choice events render first, then core events
