@@ -50,6 +50,10 @@ const CalendarOverlay = ({ currentDate, onDateClick }) => {
   const overlayRef = React.useRef(null);
   const [visibleWeeks, setVisibleWeeks] = React.useState(6);
 
+  // Track touch/mouse movement to distinguish between tap/click and scroll/drag
+  const touchStartPos = React.useRef({ x: 0, y: 0 });
+  const hasMoved = React.useRef(false);
+
   // Get the calendar dates
   const getCalendarDates = () => {
     const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -87,6 +91,46 @@ const CalendarOverlay = ({ currentDate, onDateClick }) => {
     // Check after render
     setTimeout(checkVisibleWeeks, 0);
   }, [currentDate, visibleWeeks]);
+
+  // Handle touch start - record initial position
+  const handleTouchStart = (e) => {
+    touchStartPos.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    };
+    hasMoved.current = false;
+  };
+
+  // Handle touch move - track if user is scrolling
+  const handleTouchMove = (e) => {
+    const moveThreshold = 10; // pixels
+    const deltaX = Math.abs(e.touches[0].clientX - touchStartPos.current.x);
+    const deltaY = Math.abs(e.touches[0].clientY - touchStartPos.current.y);
+
+    if (deltaX > moveThreshold || deltaY > moveThreshold) {
+      hasMoved.current = true;
+    }
+  };
+
+  // Handle mouse down - record initial position
+  const handleMouseDown = (e) => {
+    touchStartPos.current = {
+      x: e.clientX,
+      y: e.clientY
+    };
+    hasMoved.current = false;
+  };
+
+  // Handle mouse move - track if user is dragging
+  const handleMouseMove = (e) => {
+    const moveThreshold = 10; // pixels
+    const deltaX = Math.abs(e.clientX - touchStartPos.current.x);
+    const deltaY = Math.abs(e.clientY - touchStartPos.current.y);
+
+    if (deltaX > moveThreshold || deltaY > moveThreshold) {
+      hasMoved.current = true;
+    }
+  };
 
   return (
     <div
@@ -141,10 +185,22 @@ const CalendarOverlay = ({ currentDate, onDateClick }) => {
                 return (
                   <div
                     key={`day-${dateIndex}`}
-                    onClick={() => onDateClick(date)}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onClick={(e) => {
+                      // Only trigger if there was no significant movement
+                      if (!hasMoved.current) {
+                        onDateClick(date);
+                      }
+                    }}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
                     onTouchEnd={(e) => {
-                      e.preventDefault();
-                      onDateClick(date);
+                      // Only trigger if there was no significant movement
+                      if (!hasMoved.current) {
+                        e.preventDefault();
+                        onDateClick(date);
+                      }
                     }}
                     style={{
                       flex: 1,
