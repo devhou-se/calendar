@@ -4,6 +4,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { prepareEventForCalendar } from './dateUtils';
+import { getLocationsForDate, getGroupDisplayName, getTodayInJST } from './locationUtils';
 import DateLocationModal from './DateLocationModal';
 
 // Setup the localizer for react-big-calendar
@@ -289,6 +290,21 @@ function DevhouseView() {
     };
   };
 
+  // Function to highlight today's date
+  const dayPropGetter = (date) => {
+    const isToday = date.toDateString() === getTodayInJST().toDateString();
+
+    if (isToday) {
+      return {
+        style: {
+          backgroundColor: '#fff3cd',
+          border: '2px solid #ffc107'
+        }
+      };
+    }
+    return {};
+  };
+
   // Export calendar as ICS file
   const handleExportCalendar = () => {
     if (events.length === 0) {
@@ -346,78 +362,9 @@ function DevhouseView() {
     URL.revokeObjectURL(url);
   };
 
-  // Get current time in JST (UTC+9)
-  const getCurrentJSTTime = () => {
-    const now = new Date();
-    // Convert to JST by adding 9 hours to UTC
-    const jstOffset = 9 * 60; // JST is UTC+9
-    const localOffset = now.getTimezoneOffset(); // Local offset from UTC in minutes (negative for ahead of UTC)
-    const jstTime = new Date(now.getTime() + (jstOffset + localOffset) * 60 * 1000);
-    return jstTime;
-  };
-
-  // Get current location for a member
-  const getCurrentLocation = (memberInitials) => {
-    const jstNow = getCurrentJSTTime();
-    const jstHour = jstNow.getHours();
-
-    // Get all dealer's choice events for this member
-    const memberEvents = events
-      .filter(event =>
-        event.type === 'dealers-choice' &&
-        event.attendees &&
-        event.attendees.includes(memberInitials)
-      )
-      .sort((a, b) => a.start - b.start);
-
-    if (memberEvents.length === 0) {
-      return null;
-    }
-
-    // Find the event(s) the member is in today
-    const todayStart = new Date(jstNow);
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(jstNow);
-    todayEnd.setHours(23, 59, 59, 999);
-
-    // Find events that overlap with today
-    const currentEvents = memberEvents.filter(event => {
-      const eventStart = new Date(event.start);
-      const eventEnd = new Date(event.end);
-      eventStart.setHours(0, 0, 0, 0);
-      eventEnd.setHours(23, 59, 59, 999);
-
-      return eventStart <= todayEnd && eventEnd >= todayStart;
-    });
-
-    if (currentEvents.length === 0) {
-      return null;
-    }
-
-    // If there are multiple events today (transitioning), apply the 10am rule
-    if (currentEvents.length > 1) {
-      // Sort by start time
-      currentEvents.sort((a, b) => a.start - b.start);
-
-      // Before 10am JST: show the earlier location
-      // After 10am JST: show the later location
-      if (jstHour < 10) {
-        return currentEvents[0].title;
-      } else {
-        return currentEvents[currentEvents.length - 1].title;
-      }
-    }
-
-    // Only one event today
-    return currentEvents[0].title;
-  };
-
-  // Get current locations for all members
-  const getCurrentLocations = () => {
-    return MEMBERS.map(member => ({
-      ...member,
-      location: getCurrentLocation(member.initials)
-    })).filter(member => member.location !== null);
+  // Get today's locations using shared utility
+  const getTodayLocations = () => {
+    return getLocationsForDate(getTodayInJST(), events, MEMBERS);
   };
 
   // Update document title
@@ -478,6 +425,7 @@ function DevhouseView() {
           startAccessor="start"
           endAccessor="end"
           eventPropGetter={eventStyleGetter}
+          dayPropGetter={dayPropGetter}
           defaultView="month"
           views={['month']}
           toolbar={false}
@@ -492,48 +440,63 @@ function DevhouseView() {
       </div>
 
       {/* Current Location Tracker */}
-      {events.some(e => e.type === 'dealers-choice') && (
-        <div style={{
-          marginTop: '30px',
-          padding: '20px',
-          backgroundColor: '#f5f5f5',
-          borderRadius: '8px',
-          border: '1px solid #ddd'
-        }}>
-          <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#333' }}>
-            Current Locations (JST Time: {getCurrentJSTTime().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Tokyo' })})
-          </h3>
+      <div style={{
+        marginTop: '30px',
+        padding: '20px',
+        backgroundColor: '#f5f5f5',
+        borderRadius: '8px',
+        border: '1px solid #ddd'
+      }}>
+        <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#333' }}>
+          Current Locations
+        </h3>
+        {getTodayLocations().length > 0 ? (
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-            gap: '10px'
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px'
           }}>
-            {getCurrentLocations().map(member => (
-              <div key={member.initials} style={{
-                padding: '10px 15px',
+            {getTodayLocations().map((item, index) => (
+              <div key={index} style={{
+                padding: '12px 15px',
                 backgroundColor: 'white',
                 borderRadius: '5px',
-                border: '1px solid #ccc',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
+                border: '1px solid #ccc'
               }}>
-                <span style={{ fontWeight: 'bold', color: '#2196F3' }}>
-                  {member.name} ({member.initials}):
-                </span>
-                <span style={{ color: '#666' }}>
-                  {member.location}
-                </span>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginBottom: '8px'
+                }}>
+                  <span style={{ fontWeight: 'bold', color: '#2196F3', fontSize: '15px' }}>
+                    {getGroupDisplayName(item)}
+                  </span>
+                  <span style={{ color: '#666', fontSize: '13px' }}>
+                    {item.count} {item.count === 1 ? 'person' : 'people'}
+                  </span>
+                </div>
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  paddingLeft: '10px'
+                }}>
+                  {item.attendees.map((name, idx) => (
+                    <span key={idx} style={{ color: '#555', fontSize: '14px' }}>
+                      • {name}
+                    </span>
+                  ))}
+                </div>
               </div>
             ))}
-            {getCurrentLocations().length === 0 && (
-              <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#999', padding: '20px' }}>
-                No members are currently at dealer's choice locations
-              </div>
-            )}
           </div>
-        </div>
-      )}
+        ) : (
+          <div style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
+            No events scheduled for today
+          </div>
+        )}
+      </div>
 
       {/* Event Detail Modal - Disabled, using date modal instead */}
       {/* {showEventModal && selectedEvent && (
