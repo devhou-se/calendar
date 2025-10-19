@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { prepareEventForCalendar } from './dateUtils';
-import EventDetailModal from './EventDetailModal';
+import DateLocationModal from './DateLocationModal';
 
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
@@ -51,6 +51,124 @@ const DEVHOUSE_DATES = [
   {"id":1700000012,"title":"Otsu","start":"2025-11-06T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]}
 ];
 
+// Calendar overlay component to capture clicks on dates
+const CalendarOverlay = ({ currentDate, onDateClick }) => {
+  const overlayRef = React.useRef(null);
+  const [visibleWeeks, setVisibleWeeks] = React.useState(6);
+
+  // Get the calendar dates
+  const getCalendarDates = () => {
+    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+    // Get the day of week for the first day
+    const firstDayOfWeek = firstDay.getDay();
+
+    // Calculate start date (include previous month days)
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - firstDayOfWeek);
+
+    // Always create 42 dates (6 weeks)
+    const dates = [];
+    for (let i = 0; i < 42; i++) {
+      const date = new Date(startDate);
+      date.setDate(date.getDate() + i);
+      dates.push(date);
+    }
+
+    return dates;
+  };
+
+  const dates = getCalendarDates();
+
+  // Detect how many weeks are actually visible in the calendar
+  React.useEffect(() => {
+    const checkVisibleWeeks = () => {
+      const monthRows = document.querySelectorAll('.rbc-month-row');
+      const visible = Array.from(monthRows).filter(row => row.offsetHeight > 0).length;
+      if (visible > 0 && visible !== visibleWeeks) {
+        setVisibleWeeks(visible);
+      }
+    };
+
+    // Check after render
+    setTimeout(checkVisibleWeeks, 0);
+  }, [currentDate, visibleWeeks]);
+
+  return (
+    <div
+      ref={overlayRef}
+      className="calendar-click-overlay"
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 100,
+        pointerEvents: 'none',
+      }}
+    >
+      {/* Match calendar structure exactly */}
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+      }}>
+        {/* Header spacer */}
+        <div style={{
+          minHeight: '0px',
+          height: 'auto',
+        }}>
+          <div className="rbc-header" style={{ visibility: 'hidden', pointerEvents: 'none' }}>
+            <span>Sun</span>
+          </div>
+        </div>
+
+        {/* Month content */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          {/* Create overlay rows only for visible weeks */}
+          {[...Array(visibleWeeks)].map((_, weekIndex) => (
+            <div
+              key={`week-${weekIndex}`}
+              style={{
+                flex: 1,
+                display: 'flex',
+                minHeight: 0,
+              }}
+            >
+              {/* 7 days per week */}
+              {[...Array(7)].map((_, dayIndex) => {
+                const dateIndex = weekIndex * 7 + dayIndex;
+                const date = dates[dateIndex];
+                return (
+                  <div
+                    key={`day-${dateIndex}`}
+                    onClick={() => onDateClick(date)}
+                    onTouchEnd={(e) => {
+                      e.preventDefault();
+                      onDateClick(date);
+                    }}
+                    style={{
+                      flex: 1,
+                      cursor: 'pointer',
+                      pointerEvents: 'auto',
+                      backgroundColor: 'transparent',
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 function DevhouseView() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -77,8 +195,8 @@ function DevhouseView() {
   const [cityColors, setCityColors] = useState({});
   const [currentDate] = useState(new Date(2025, 10, 1)); // November 2025
   const [selectedAttendees, setSelectedAttendees] = useState([]);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [showEventModal, setShowEventModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [showDateModal, setShowDateModal] = useState(false);
 
   // Member information
   const MEMBERS = [
@@ -124,16 +242,16 @@ function DevhouseView() {
     );
   };
 
-  // Handle event selection
-  const handleSelectEvent = (event) => {
-    setSelectedEvent(event);
-    setShowEventModal(true);
+  // Handle date click from overlay
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    setShowDateModal(true);
   };
 
-  // Handle modal close
-  const handleCloseModal = () => {
-    setShowEventModal(false);
-    setSelectedEvent(null);
+  // Handle date modal close
+  const handleCloseDateModal = () => {
+    setShowDateModal(false);
+    setSelectedDate(null);
   };
 
   // Assign colors to cities
@@ -353,7 +471,7 @@ function DevhouseView() {
         </button>
       </div>
 
-      <div>
+      <div style={{ position: 'relative' }}>
         <Calendar
           localizer={localizer}
           events={filteredEvents.map(prepareEventForCalendar)}
@@ -368,8 +486,9 @@ function DevhouseView() {
           drilldownView={null}
           date={currentDate}
           onNavigate={() => {}} // Disable navigation
-          onSelectEvent={handleSelectEvent}
         />
+        {/* Overlay grid to capture clicks */}
+        <CalendarOverlay currentDate={currentDate} onDateClick={handleDateClick} />
       </div>
 
       {/* Current Location Tracker */}
@@ -416,12 +535,22 @@ function DevhouseView() {
         </div>
       )}
 
-      {/* Event Detail Modal */}
-      {showEventModal && selectedEvent && (
+      {/* Event Detail Modal - Disabled, using date modal instead */}
+      {/* {showEventModal && selectedEvent && (
         <EventDetailModal
           event={selectedEvent}
           onClose={handleCloseModal}
           members={MEMBERS}
+        />
+      )} */}
+
+      {/* Date Location Modal */}
+      {showDateModal && selectedDate && (
+        <DateLocationModal
+          date={selectedDate}
+          events={events}
+          members={MEMBERS}
+          onClose={handleCloseDateModal}
         />
       )}
     </div>

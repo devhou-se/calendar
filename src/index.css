@@ -1161,6 +1161,35 @@ button.load-devhouse {
   background-color: #f0f0f0;
 }
 
+.date-nav-arrow {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #666;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.date-nav-arrow:hover {
+  background-color: #f0f0f0;
+}
+
+.date-nav-arrow:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.date-nav-arrow:disabled:hover {
+  background-color: transparent;
+}
+
 .event-detail-content {
   padding: 24px;
 }
@@ -1216,13 +1245,120 @@ button.load-devhouse {
   }
 }
 
-/* Enable pointer events on calendar events in DevhouseView */
+/* Disable pointer events on events so clicks pass through to overlay */
 .devhouse-view .rbc-event {
-  cursor: pointer !important;
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
+/* Remove event hover effects */
 .devhouse-view .rbc-event:hover {
-  opacity: 0.85 !important;
-  transform: scale(1.01) !important;
-  transition: all 0.15s ease !important;
+  transform: none !important;
+  opacity: 0.8 !important;
+}
+
+/* Add hover effect to date cells to show they're clickable */
+.devhouse-view .rbc-day-bg {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: rgba(33, 150, 243, 0.2);
+}
+
+.devhouse-view .rbc-day-bg:hover {
+  background-color: rgba(33, 150, 243, 0.08) !important;
+}
+
+.devhouse-view .rbc-day-bg:active {
+  background-color: rgba(33, 150, 243, 0.15) !important;
+}
+
+/* Highlight effect for the current month dates */
+.devhouse-view .rbc-date-cell {
+  transition: all 0.2s ease;
+}
+
+.devhouse-view .rbc-off-range .rbc-day-bg:hover {
+  background-color: rgba(33, 150, 243, 0.04) !important;
+}
+
+/* Date Location Modal Styles */
+.date-location-modal {
+  max-height: 85vh;
+}
+
+.location-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.location-group {
+  background-color: #f8f8f8;
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid #2196F3;
+}
+
+.location-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.location-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #333;
+}
+
+.location-count {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2196F3;
+  background-color: rgba(33, 150, 243, 0.1);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.location-attendees {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.attendee-item {
+  font-size: 16px;
+  color: #555;
+  padding: 4px 0;
+}
+
+.no-locations {
+  text-align: center;
+  padding: 40px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+/* Mobile responsiveness for location groups */
+@media (max-width: 600px) {
+  .location-group {
+    padding: 12px;
+  }
+
+  .location-name {
+    font-size: 16px;
+  }
+
+  .location-count {
+    font-size: 12px;
+    padding: 3px 10px;
+  }
+
+  .attendee-item {
+    font-size: 14px;
+  }
 }
