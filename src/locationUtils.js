@@ -1,4 +1,5 @@
 // Utility functions for grouping locations and attendees by date
+import { translateLocation, translateUI } from './translations';
 
 /**
  * Get all locations and their attendees for a specific date
@@ -202,17 +203,26 @@ export const getLocationsForDate = (selectedDate, events, members) => {
 /**
  * Get display name for a location group
  * @param {Object} group - Location group with type and location/route
+ * @param {Boolean} useJapanese - Whether to use Japanese translations
  * @returns {String} Display name for the group
  */
-export const getGroupDisplayName = (group) => {
+export const getGroupDisplayName = (group, useJapanese = false) => {
   if (group.type === 'travel') {
-    return group.route;
+    // For travel routes, translate both locations
+    const [from, to] = group.route.split(' → ');
+    const translatedFrom = translateLocation(from.trim(), useJapanese);
+    const translatedTo = translateLocation(to.trim(), useJapanese);
+    return `${translatedFrom} → ${translatedTo}`;
   } else if (group.type === 'arrival') {
-    return `Arriving in ${group.location}`;
+    const translatedLocation = translateLocation(group.location, useJapanese);
+    const arrivingText = translateUI('Arriving in', useJapanese);
+    return `${arrivingText}${translatedLocation}`;
   } else if (group.type === 'departure') {
-    return `Departing ${group.location}`;
+    const translatedLocation = translateLocation(group.location, useJapanese);
+    const departingText = translateUI('Departing', useJapanese);
+    return `${departingText}${translatedLocation}`;
   } else {
-    return group.location;
+    return translateLocation(group.location, useJapanese);
   }
 };
 

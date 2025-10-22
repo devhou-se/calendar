@@ -1,5 +1,6 @@
 import React from 'react';
 import { getLocationsForDate, getGroupDisplayName } from './locationUtils';
+import { translateUI } from './translations';
 
 /**
  * CurrentLocations component
@@ -9,8 +10,10 @@ import { getLocationsForDate, getGroupDisplayName } from './locationUtils';
  * @param {Array} events - Array of event objects
  * @param {Array} members - Array of member objects with name and initials
  * @param {String} title - Optional title to display (defaults to "Current Locations")
+ * @param {Boolean} standalone - Whether to use standalone styling
+ * @param {Boolean} useJapanese - Whether to use Japanese translations
  */
-function CurrentLocations({ date, events, members, title = "Current Locations", standalone = false }) {
+function CurrentLocations({ date, events, members, title = "Current Locations", standalone = false, useJapanese = false }) {
   const locations = getLocationsForDate(date, events, members);
 
   return (
@@ -26,7 +29,7 @@ function CurrentLocations({ date, events, members, title = "Current Locations", 
       boxSizing: 'border-box'
     }}>
       <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#FF0000', fontSize: '14px' }}>
-        {title}
+        {translateUI(title, useJapanese)}
       </h3>
       {locations.length > 0 ? (
         <div style={{
@@ -49,10 +52,10 @@ function CurrentLocations({ date, events, members, title = "Current Locations", 
                 marginBottom: '8px'
               }}>
                 <span style={{ fontWeight: 'bold', color: '#FF0000', fontSize: '15px' }}>
-                  {getGroupDisplayName(item)}
+                  {getGroupDisplayName(item, useJapanese)}
                 </span>
                 <span style={{ color: '#cccccc', fontSize: '13px' }}>
-                  {item.count} {item.count === 1 ? 'person' : 'people'}
+                  {item.count} {translateUI(item.count === 1 ? 'person' : 'people', useJapanese)}
                 </span>
               </div>
               <div style={{
@@ -72,7 +75,7 @@ function CurrentLocations({ date, events, members, title = "Current Locations", 
         </div>
       ) : (
         <div style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
-          No events scheduled for this date
+          {translateUI('No events scheduled for this date', useJapanese)}
         </div>
       )}
     </div>

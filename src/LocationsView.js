@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import CurrentLocations from './CurrentLocations';
 import { getTodayInJST } from './locationUtils';
 
@@ -44,8 +45,40 @@ const MEMBERS = [
 /**
  * LocationsView - Standalone page for displaying current locations
  * Designed specifically for iframe embedding
+ * Supports ?lang=ja or ?jp=true for Japanese translations
+ * Supports ?date=YYYY-MM-DD for custom date (defaults to today in JST)
  */
 function LocationsView() {
+  const [searchParams] = useSearchParams();
+
+  // Check for Japanese language query parameter
+  const useJapanese = searchParams.get('lang') === 'ja' || searchParams.get('jp') === 'true';
+
+  // Parse date parameter (format: YYYY-MM-DD)
+  const getDisplayDate = () => {
+    const dateParam = searchParams.get('date');
+
+    if (dateParam) {
+      // Parse YYYY-MM-DD format
+      const [year, month, day] = dateParam.split('-').map(num => parseInt(num, 10));
+
+      // Validate the date
+      if (year && month && day && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+        const date = new Date(year, month - 1, day, 0, 0, 0, 0);
+
+        // Check if the date is valid (e.g., not Feb 31)
+        if (date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day) {
+          return date;
+        }
+      }
+    }
+
+    // Default to today in JST
+    return getTodayInJST();
+  };
+
+  const displayDate = getDisplayDate();
+
   // Convert dates to Date objects
   const events = DEVHOUSE_DATES.map(event => ({
     ...event,
@@ -55,8 +88,8 @@ function LocationsView() {
 
   // Update document title
   useEffect(() => {
-    document.title = 'devhouse - current locations';
-  }, []);
+    document.title = useJapanese ? 'devhouse - 現在の場所' : 'devhouse - current locations';
+  }, [useJapanese]);
 
   return (
     <div style={{
@@ -68,10 +101,11 @@ function LocationsView() {
       boxSizing: 'border-box'
     }}>
       <CurrentLocations
-        date={getTodayInJST()}
+        date={displayDate}
         events={events}
         members={MEMBERS}
         standalone={true}
+        useJapanese={useJapanese}
       />
     </div>
   );
