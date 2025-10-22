@@ -4,8 +4,9 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { prepareEventForCalendar } from './dateUtils';
-import { getLocationsForDate, getGroupDisplayName, getTodayInJST } from './locationUtils';
+import { getTodayInJST } from './locationUtils';
 import DateLocationModal from './DateLocationModal';
+import CurrentLocations from './CurrentLocations';
 
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
@@ -394,10 +395,6 @@ function DevhouseView() {
     URL.revokeObjectURL(url);
   };
 
-  // Get today's locations using shared utility
-  const getTodayLocations = () => {
-    return getLocationsForDate(getTodayInJST(), events, MEMBERS);
-  };
 
   // Update document title
   useEffect(() => {
@@ -481,65 +478,11 @@ function DevhouseView() {
       </div>
 
       {/* Current Location Tracker */}
-      <div style={{
-        marginTop: '30px',
-        padding: '15px',
-        backgroundColor: '#1a1a1a',
-        borderRadius: '0',
-        border: '2px solid #333333',
-        boxShadow: '0 0 10px rgba(255, 0, 0, 0.1)'
-      }}>
-        <h3 style={{ marginTop: 0, marginBottom: '15px', color: '#FF0000', fontSize: '14px' }}>
-          Current Locations
-        </h3>
-        {getTodayLocations().length > 0 ? (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '15px'
-          }}>
-            {getTodayLocations().map((item, index) => (
-              <div key={index} style={{
-                padding: '12px 15px',
-                backgroundColor: '#0a0a0a',
-                borderRadius: '0',
-                border: '2px solid #333333',
-                boxShadow: '0 0 5px rgba(255, 0, 0, 0.1)'
-              }}>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: '8px'
-                }}>
-                  <span style={{ fontWeight: 'bold', color: '#FF0000', fontSize: '15px' }}>
-                    {getGroupDisplayName(item)}
-                  </span>
-                  <span style={{ color: '#cccccc', fontSize: '13px' }}>
-                    {item.count} {item.count === 1 ? 'person' : 'people'}
-                  </span>
-                </div>
-                <div style={{
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: '8px',
-                  paddingLeft: '10px'
-                }}>
-                  {item.attendees.map((name, idx) => (
-                    <span key={idx} style={{ color: '#dddddd', fontSize: '14px' }}>
-                      • {name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div style={{ textAlign: 'center', color: '#999', padding: '20px' }}>
-            No events scheduled for today
-          </div>
-        )}
-      </div>
+      <CurrentLocations
+        date={getTodayInJST()}
+        events={events}
+        members={MEMBERS}
+      />
 
       {/* Event Detail Modal - Disabled, using date modal instead */}
       {/* {showEventModal && selectedEvent && (
