@@ -47,12 +47,16 @@ const MEMBERS = [
  * Designed specifically for iframe embedding
  * Supports ?lang=ja or ?jp=true for Japanese translations
  * Supports ?date=YYYY-MM-DD for custom date (defaults to today in JST)
+ * Supports ?theme=light or ?theme=dark for theme selection (defaults to dark)
  */
 function LocationsView() {
   const [searchParams] = useSearchParams();
 
   // Check for Japanese language query parameter
   const useJapanese = searchParams.get('lang') === 'ja' || searchParams.get('jp') === 'true';
+
+  // Check for theme query parameter (default to dark)
+  const theme = searchParams.get('theme') === 'light' ? 'light' : 'dark';
 
   // Parse date parameter (format: YYYY-MM-DD)
   const getDisplayDate = () => {
@@ -94,10 +98,10 @@ function LocationsView() {
   return (
     <div style={{
       padding: '0',
-      backgroundColor: '#0a0a0a',
+      backgroundColor: theme === 'light' ? '#f5f5f5' : '#0a0a0a',
       width: '100%',
       height: '100vh',
-      color: '#ffffff',
+      color: theme === 'light' ? '#1a1a1a' : '#ffffff',
       boxSizing: 'border-box'
     }}>
       <CurrentLocations
@@ -106,6 +110,7 @@ function LocationsView() {
         members={MEMBERS}
         standalone={true}
         useJapanese={useJapanese}
+        theme={theme}
       />
     </div>
   );
