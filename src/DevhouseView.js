@@ -3,7 +3,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { prepareEventForCalendar } from './dateUtils';
+import { prepareEventForCalendar, parseDateString } from './dateUtils';
 import { getTodayInJST } from './locationUtils';
 import DateLocationModal from './DateLocationModal';
 import CurrentLocations from './CurrentLocations';
@@ -21,29 +21,29 @@ const EVENT_COLORS = {
 // Devhouse dates
 const DEVHOUSE_DATES = [
   // Core events with attendees
-  {"id":1743312030622,"title":"Sendai","start":"2025-10-25T13:00:00.000Z","end":"2025-10-29T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
-  {"id":1743311975675,"title":"Tokyo","start":"2025-10-29T13:00:00.000Z","end":"2025-10-31T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","GG","JG","VB","YV"]},
-  {"id":1743312066182,"title":"Fukuoka","start":"2025-11-07T13:00:00.000Z","end":"2025-11-11T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
-  {"id":1757817492179,"title":"Okayama","start":"2025-11-11T13:00:00.000Z","end":"2025-11-12T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
-  {"id":1743312070472,"title":"Osaka","start":"2025-11-12T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
+  {"id":1743312030622,"title":"Sendai","start":"2025-10-26","end":"2025-10-30","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
+  {"id":1743311975675,"title":"Tokyo","start":"2025-10-30","end":"2025-11-01","allDay":true,"type":"core","attendees":["BB","DB","DT","GG","JG","VB","YV"]},
+  {"id":1743312066182,"title":"Fukuoka","start":"2025-11-08","end":"2025-11-12","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
+  {"id":1757817492179,"title":"Okayama","start":"2025-11-12","end":"2025-11-13","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
+  {"id":1743312070472,"title":"Osaka","start":"2025-11-13","end":"2025-11-17","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
 
   // Other events (no attendees)
-  {"id":1743313244238,"title":"Land","start":"2025-10-25T13:00:00.000Z","end":"2025-10-25T13:00:00.000Z","allDay":true,"type":"other"},
-  {"id":1743312089552,"title":"Leave","start":"2025-11-16T13:00:00.000Z","end":"2025-11-16T13:00:00.000Z","allDay":true,"type":"other"},
+  {"id":1743313244238,"title":"Land","start":"2025-10-26","end":"2025-10-26","allDay":true,"type":"other"},
+  {"id":1743312089552,"title":"Leave","start":"2025-11-17","end":"2025-11-17","allDay":true,"type":"other"},
 
   // Dealer's choice events
-  {"id":1700000001,"title":"Karuizawa","start":"2025-10-31T13:00:00.000Z","end":"2025-11-01T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000002,"title":"Osaka","start":"2025-10-31T13:00:00.000Z","end":"2025-11-01T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000003,"title":"Tokyo","start":"2025-10-31T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","GG","VB","YV"]},
-  {"id":1700000004,"title":"Otsu","start":"2025-11-01T13:00:00.000Z","end":"2025-11-02T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000005,"title":"Toyama","start":"2025-11-01T13:00:00.000Z","end":"2025-11-03T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000006,"title":"Higashiomi","start":"2025-11-02T13:00:00.000Z","end":"2025-11-03T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000007,"title":"Nagahama","start":"2025-11-03T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000008,"title":"Shirakawa-Go","start":"2025-11-03T13:00:00.000Z","end":"2025-11-04T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000009,"title":"Kanazawa","start":"2025-11-04T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["BB","DT","GG","JG","YV"]},
-  {"id":1700000010,"title":"Tsuruga","start":"2025-11-04T13:00:00.000Z","end":"2025-11-05T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000011,"title":"Takashima","start":"2025-11-05T13:00:00.000Z","end":"2025-11-06T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000012,"title":"Otsu","start":"2025-11-06T13:00:00.000Z","end":"2025-11-07T13:00:00.000Z","allDay":true,"type":"dealers-choice","attendees":["DB"]}
+  {"id":1700000001,"title":"Karuizawa","start":"2025-11-01","end":"2025-11-02","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
+  {"id":1700000002,"title":"Osaka","start":"2025-11-01","end":"2025-11-02","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+  {"id":1700000003,"title":"Tokyo","start":"2025-11-01","end":"2025-11-05","allDay":true,"type":"dealers-choice","attendees":["BB","GG","VB","YV"]},
+  {"id":1700000004,"title":"Otsu","start":"2025-11-02","end":"2025-11-03","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+  {"id":1700000005,"title":"Toyama","start":"2025-11-02","end":"2025-11-04","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
+  {"id":1700000006,"title":"Higashiomi","start":"2025-11-03","end":"2025-11-04","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+  {"id":1700000007,"title":"Nagahama","start":"2025-11-04","end":"2025-11-05","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+  {"id":1700000008,"title":"Shirakawa-Go","start":"2025-11-04","end":"2025-11-05","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
+  {"id":1700000009,"title":"Kanazawa","start":"2025-11-05","end":"2025-11-08","allDay":true,"type":"dealers-choice","attendees":["BB","DT","GG","JG","YV"]},
+  {"id":1700000010,"title":"Tsuruga","start":"2025-11-05","end":"2025-11-06","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+  {"id":1700000011,"title":"Takashima","start":"2025-11-06","end":"2025-11-07","allDay":true,"type":"dealers-choice","attendees":["DB"]},
+  {"id":1700000012,"title":"Otsu","start":"2025-11-07","end":"2025-11-08","allDay":true,"type":"dealers-choice","attendees":["DB"]}
 ];
 
 // Calendar overlay component to capture clicks on dates
@@ -104,7 +104,7 @@ const CalendarOverlay = ({ currentDate, onDateClick }) => {
 
   // Handle touch move - track if user is scrolling
   const handleTouchMove = (e) => {
-    const moveThreshold = 10; // pixels
+    const moveThreshold = 15; // pixels
     const deltaX = Math.abs(e.touches[0].clientX - touchStartPos.current.x);
     const deltaY = Math.abs(e.touches[0].clientY - touchStartPos.current.y);
 
@@ -124,7 +124,7 @@ const CalendarOverlay = ({ currentDate, onDateClick }) => {
 
   // Handle mouse move - track if user is dragging
   const handleMouseMove = (e) => {
-    const moveThreshold = 10; // pixels
+    const moveThreshold = 15; // pixels
     const deltaX = Math.abs(e.clientX - touchStartPos.current.x);
     const deltaY = Math.abs(e.clientY - touchStartPos.current.y);
 
@@ -237,8 +237,8 @@ function DevhouseView() {
     // Always use devhouse dates for the main view (redirect happens if ?data= is present)
     return DEVHOUSE_DATES.map(event => ({
       ...event,
-      start: new Date(event.start),
-      end: new Date(event.end)
+      start: parseDateString(event.start),
+      end: parseDateString(event.end)
     }));
   };
 

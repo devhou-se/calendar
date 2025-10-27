@@ -216,11 +216,11 @@ export const getGroupDisplayName = (group, useJapanese = false) => {
   } else if (group.type === 'arrival') {
     const translatedLocation = translateLocation(group.location, useJapanese);
     const arrivingText = translateUI('Arriving in', useJapanese);
-    return `${arrivingText}${translatedLocation}`;
+    return `${arrivingText} ${translatedLocation}`;
   } else if (group.type === 'departure') {
     const translatedLocation = translateLocation(group.location, useJapanese);
     const departingText = translateUI('Departing', useJapanese);
-    return `${departingText}${translatedLocation}`;
+    return `${departingText} ${translatedLocation}`;
   } else {
     return translateLocation(group.location, useJapanese);
   }

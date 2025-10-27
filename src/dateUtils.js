@@ -102,17 +102,23 @@ export const validateDateRange = (start, end) => {
 export const dateToDaysSinceEpoch = (date) => {
   if (!date) return 0;
   const d = new Date(date);
-  // Create a date at UTC midnight for the given date
-  const utc = Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  // Normalize to local midnight first
+  const localMidnight = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  // Then convert to UTC to get consistent day count
+  const utc = Date.UTC(
+    localMidnight.getUTCFullYear(),
+    localMidnight.getUTCMonth(),
+    localMidnight.getUTCDate()
+  );
   return Math.floor(utc / 86400000);
 };
 
 // Convert days since epoch to date
 export const daysSinceEpochToDate = (days) => {
   if (!days && days !== 0) return null;
-  // Convert back to milliseconds
+  // Convert days to milliseconds (UTC)
   const ms = days * 86400000;
   const d = new Date(ms);
-  // Create a local date with the UTC values to maintain the correct day
+  // Create a local date with the UTC date components
   return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 };
