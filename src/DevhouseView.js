@@ -409,7 +409,6 @@ function DevhouseView() {
           alt="devhouse logo"
           style={{ height: '60px', filter: 'drop-shadow(0 0 5px rgba(255, 0, 0, 0.3))' }}
         />
-        <h1 style={{ margin: 0 }}>calendar</h1>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
@@ -451,9 +450,6 @@ function DevhouseView() {
             </button>
           ))}
         </div>
-        <button onClick={handleExportCalendar} className="export">
-          Export Calendar (ICS)
-        </button>
       </div>
 
       <div style={{ position: 'relative' }}>

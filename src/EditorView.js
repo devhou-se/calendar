@@ -532,7 +532,6 @@ function EditorView() {
           alt="devhouse logo"
           style={{ height: '60px', filter: 'drop-shadow(0 0 5px rgba(255, 0, 0, 0.3))' }}
         />
-        <h1 style={{ margin: 0 }}>calendar</h1>
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -555,12 +554,8 @@ function EditorView() {
         </div>
 
         <div>
-          <button onClick={handleShareLink} className="share" style={{ marginRight: '10px' }}>
+          <button onClick={handleShareLink} className="share">
             Share Link
-          </button>
-
-          <button onClick={handleExportCalendar} className="export">
-            Export Calendar (ICS)
           </button>
         </div>
       </div>
