@@ -338,64 +338,6 @@ function DevhouseView() {
     return {};
   };
 
-  // Export calendar as ICS file
-  const handleExportCalendar = () => {
-    if (events.length === 0) {
-      alert('No events to export');
-      return;
-    }
-
-    // Generate ICS content manually
-    let icsContent = [
-      'BEGIN:VCALENDAR',
-      'VERSION:2.0',
-      'PRODID:-//DevHouse Calendar//EN',
-      'CALSCALE:GREGORIAN',
-      'METHOD:PUBLISH'
-    ];
-
-    // Add each event
-    events.forEach(event => {
-      const startDateFormatted = moment(event.start).format('YYYYMMDD[T]HHmmss');
-      // ICS format expects exclusive end dates, so add one day to our inclusive end date
-      const exclusiveEnd = new Date(event.end);
-      exclusiveEnd.setDate(exclusiveEnd.getDate() + 1);
-      const endDateFormatted = moment(exclusiveEnd).format('YYYYMMDD[T]HHmmss');
-
-      icsContent = [
-        ...icsContent,
-        'BEGIN:VEVENT',
-        `UID:${event.id}@devhousecalendar`,
-        `DTSTAMP:${moment().format('YYYYMMDD[T]HHmmss')}`,
-        `DTSTART:${startDateFormatted}`,
-        `DTEND:${endDateFormatted}`,
-        `SUMMARY:${event.title}`,
-        `DESCRIPTION:${event.title}`,
-        `LOCATION:${event.title}`,
-        'END:VEVENT'
-      ];
-    });
-
-    // Close calendar
-    icsContent.push('END:VCALENDAR');
-
-    // Join with CRLF as per RFC 5545
-    const icsString = icsContent.join('\r\n');
-
-    // Create and download the file
-    const blob = new Blob([icsString], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'devhouse-calendar.ics';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  };
-
-
   // Update document title
   useEffect(() => {
     document.title = 'devhouse calendar';
