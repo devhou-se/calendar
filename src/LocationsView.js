@@ -6,7 +6,7 @@ import { getTodayInJST } from './locationUtils';
 // Devhouse dates - same as DevhouseView
 const DEVHOUSE_DATES = [
   // Core events with attendees
-  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-17T13:00:00.000Z","end":"2027-03-17T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB"]},
+  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-17T13:00:00.000Z","end":"2027-02-27T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB"]},
 
   // Other events
   {"id":1791000000002,"title":"Land","start":"2027-02-17T13:00:00.000Z","end":"2027-02-17T13:00:00.000Z","allDay":true,"type":"other"}

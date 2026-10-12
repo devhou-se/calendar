@@ -299,7 +299,7 @@ function EditorView() {
     if (window.confirm('Are you sure you want to load the devhouse dates? This will replace all existing calendar data.')) {
       const devhouseDates = [
         // Core events
-        {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-17T13:00:00.000Z","end":"2027-03-17T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB"]},
+        {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-17T13:00:00.000Z","end":"2027-02-27T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB"]},
         {"id":1791000000002,"title":"Land","start":"2027-02-17T13:00:00.000Z","end":"2027-02-17T13:00:00.000Z","allDay":true,"type":"other"}
       ];
 

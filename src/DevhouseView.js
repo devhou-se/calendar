@@ -21,12 +21,12 @@ const EVENT_CLASSES = {
 
 // Months the trip spans - month navigation is clamped to these
 const FIRST_MONTH = new Date(2027, 1, 1); // February 2027
-const LAST_MONTH = new Date(2027, 2, 1);  // March 2027
+const LAST_MONTH = new Date(2027, 1, 1);  // February 2027
 
 // Devhouse dates
 const DEVHOUSE_DATES = [
   // Core events with attendees
-  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-18","end":"2027-03-18","allDay":true,"type":"core","attendees":["BB"]},
+  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-18","end":"2027-02-28","allDay":true,"type":"core","attendees":["BB"]},
 
   // Other events
   {"id":1791000000002,"title":"Land","start":"2027-02-18","end":"2027-02-18","allDay":true,"type":"other"}
