@@ -7,12 +7,16 @@ import { getTodayInJST } from './locationUtils';
 const DEVHOUSE_DATES = [
   // Core events with attendees
   {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-17T13:00:00.000Z","end":"2027-02-27T13:00:00.000Z","allDay":true,"type":"core","attendees":["BB"]},
+  // end: null = end date not known yet (never shown as departing)
+  {"id":1791000000004,"title":"Devhouse 3","start":"2027-02-17T13:00:00.000Z","end":null,"allDay":true,"type":"core","attendees":["DT"]},
 
   // Other events
   {"id":1791000000002,"title":"Land","start":"2027-02-17T13:00:00.000Z","end":"2027-02-17T13:00:00.000Z","allDay":true,"type":"other"}
 ];
 
 // Member information
+const TRIP_LAST_DAY = new Date(2027, 1, 28); // where open-ended stays run to
+
 const MEMBERS = [
   { name: 'Bailey', initials: 'BB' },
   { name: 'Damian', initials: 'DT' },
@@ -64,7 +68,8 @@ function LocationsView() {
   const events = DEVHOUSE_DATES.map(event => ({
     ...event,
     start: new Date(event.start),
-    end: new Date(event.end)
+    end: event.end ? new Date(event.end) : TRIP_LAST_DAY,
+    openEnded: !event.end
   }));
 
   // Update document title
