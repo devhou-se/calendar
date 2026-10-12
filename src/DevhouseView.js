@@ -239,11 +239,7 @@ function DevhouseView() {
   const MEMBERS = [
     { name: 'Bailey', initials: 'BB' },
     { name: 'Damian', initials: 'DT' },
-    { name: 'Dylan', initials: 'DB' },
-    { name: 'Gloria', initials: 'GG' },
-    { name: 'Julia', initials: 'JG' },
-    { name: 'Vyv', initials: 'VB' },
-    { name: 'Yashuk', initials: 'YV' }
+    { name: 'Dylan', initials: 'DB' }
   ];
 
   // Filter events based on selected attendees

@@ -363,10 +363,7 @@ function EditorView() {
   const MEMBERS = [
     { name: 'Bailey', initials: 'BB' },
     { name: 'Damian', initials: 'DT' },
-    { name: 'Dylan', initials: 'DB' },
-    { name: 'Julia', initials: 'JG' },
-    { name: 'Vyv', initials: 'VB' },
-    { name: 'Yashuk', initials: 'YV' }
+    { name: 'Dylan', initials: 'DB' }
   ];
 
   // Get current time in JST (UTC+9)
