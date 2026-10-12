@@ -1,0 +1,313 @@
+/* ============================================================================
+   devhou.se blog look for the public calendar views (/ and /locations).
+   Palette + components ported from www-jp's devhouse-theme
+   (style.css = night, style-light.css = day, game.css = components).
+   Everything is scoped under .dh so the editor keeps its own styling.
+   ========================================================================= */
+
+/* Pixel fonts are declared in public/index.html (served from /fonts). */
+
+/* --- NIGHT palette ------------------------------------------------------- */
+.dh[data-theme="dark"] {
+  --bg:            #0d0e13;
+  --grid-line:     rgba(255, 255, 255, 0.03);
+  --vignette:      rgba(0, 0, 0, 0.62);
+  --panel:         #1a1a1a;
+  --panel-inset:   #111216;
+  --panel-hi:      rgba(255, 255, 255, 0.05);
+  --panel-shadow:  rgba(0, 0, 0, 0.6);
+  --border:        #2f2f37;
+  --border-bright: #666666;
+  --text:          #f0f0f0;
+  --text-dim:      #8a8a8a;
+  --accent:        #ffcf47;
+  --accent-strong: #ffe24a;
+  --accent-glow:   rgba(255, 226, 74, 0.5);
+  --green:         #3ecf74;
+  --green-glow:    rgba(62, 207, 116, 0.55);
+  --select-bg:      rgba(255, 226, 74, 0.16);
+  --select-bg-soft: rgba(255, 226, 74, 0.08);
+  --select-text:    #ffe24a;
+  --hud-bg:      #0b0c10;
+  --hud-text:    #eaeaea;
+  --hud-dim:     #8a8a8a;
+  --hud-check-a: #26262d;
+  --hud-check-b: #14141b;
+
+  /* calendar events */
+  --ev-core:      #3ecf74;
+  --ev-dealer:    #ffcf47;
+  --ev-other:     #e59ab8;
+  --ev-text:      #0d0e13;
+}
+
+/* --- DAY palette --------------------------------------------------------- */
+.dh[data-theme="light"] {
+  --bg:            #e7e6d6;
+  --grid-line:     rgba(60, 60, 40, 0.05);
+  --vignette:      rgba(70, 62, 38, 0.16);
+  --panel:         #faf8ef;
+  --panel-inset:   #efece0;
+  --panel-hi:      rgba(255, 255, 255, 0.7);
+  --panel-shadow:  rgba(120, 118, 96, 0.35);
+  --border:        #cfccb9;
+  --border-bright: #8f8c76;
+  --text:          #24261c;
+  --text-dim:      #6c6f5a;
+  --accent:        #b0741a;
+  --accent-strong: #b5561f;
+  --accent-glow:   rgba(181, 86, 31, 0.35);
+  --green:         #2f8a3f;
+  --green-glow:    rgba(47, 138, 63, 0.3);
+  --select-bg:      #f3dfa8;
+  --select-bg-soft: #f6ecd2;
+  --select-text:    #4a3410;
+  --hud-bg:      #23241c;
+  --hud-text:    #ece9d8;
+  --hud-dim:     #a9a692;
+  --hud-check-a: #34352b;
+  --hud-check-b: #23241c;
+
+  --ev-core:      #2f8a3f;
+  --ev-dealer:    #b5561f;
+  --ev-other:     #a8577c;
+  --ev-text:      #faf8ef;
+}
+
+.dh {
+  --font-pixel:      'PixelOperatorMono', 'DotGothic16', 'Courier New', monospace;
+  --font-pixel-bold: 'PixelOperatorMonoBold', 'DotGothic16', 'Courier New', monospace;
+  --font-display:    'PressStart2P', 'DotGothic16', monospace;
+  --hud-h: 48px;
+
+  min-height: 100vh;
+  box-sizing: border-box;
+  color: var(--text);
+  font-family: var(--font-pixel);
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-font-smoothing: none;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 50% 38%, transparent 45%, var(--vignette) 100%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 100% 100%, 34px 34px, 34px 34px;
+  background-attachment: fixed;
+}
+.dh *, .dh *::before, .dh *::after { box-sizing: border-box; }
+.dh ::selection { background: var(--select-bg); color: var(--select-text); }
+.dh :focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; }
+.dh h1, .dh h2, .dh h3 { font-family: var(--font-pixel-bold); font-weight: normal; letter-spacing: .5px; color: var(--text); }
+.dh button { font-family: var(--font-pixel-bold); }
+
+/* ============================================================================
+   HUD — fixed top bar, as on the blog
+   ========================================================================= */
+.dh .hud {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  height: var(--hud-h);
+  background: var(--hud-bg);
+  border-bottom: 2px solid var(--border-bright);
+  display: flex; align-items: stretch; justify-content: space-between;
+}
+.dh .hud::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px;
+  background: repeating-linear-gradient(90deg, var(--hud-check-a) 0 6px, var(--hud-check-b) 6px 12px);
+}
+.dh .hud-left, .dh .hud-right { display: flex; align-items: center; min-width: 0; }
+.dh .hud-left  { padding: 0 6px 0 14px; overflow: hidden; }
+.dh .hud-right { flex-shrink: 0; }
+.dh .hud-home { display: flex; align-items: center; flex-shrink: 0; text-decoration: none; }
+.dh .hud-logo { height: 26px; margin-right: 10px; image-rendering: pixelated; }
+.dh .hud-word { font-family: var(--font-pixel-bold); font-size: 19px; letter-spacing: 1px; color: var(--hud-text); white-space: nowrap; }
+.dh .hud-home:hover .hud-word { color: var(--accent-strong); }
+.dh .hud-sep { color: var(--hud-dim); padding: 0 9px; user-select: none; flex-shrink: 0; }
+.dh .hud-crumb { color: var(--hud-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dh .hud-loc { flex-shrink: 0; }
+.dh .hud-loc::before {
+  content: ''; display: inline-block; width: 9px; height: 9px; margin-right: 6px;
+  background: var(--green); box-shadow: 0 0 6px var(--green-glow);
+}
+.dh .hud-btn {
+  font-size: 15px; letter-spacing: 1px;
+  color: var(--hud-text); background: transparent; cursor: pointer;
+  border: none; border-left: 2px solid var(--border);
+  padding: 0 18px; height: 100%;
+}
+.dh .hud-btn:hover { background: var(--select-bg); color: var(--select-text); }
+
+/* ============================================================================
+   Stage + RPG windows
+   ========================================================================= */
+.dh .stage {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: calc(var(--hud-h) + 16px) 16px 32px;
+}
+.dh .window {
+  background: var(--panel);
+  border: 2px solid var(--border-bright);
+  box-shadow: 0 3px 0 var(--panel-shadow), inset 0 0 0 1px var(--panel-hi);
+  margin: 0 0 18px;
+  position: relative;
+}
+.dh .window-title {
+  font-family: var(--font-pixel-bold);
+  font-size: 15px; letter-spacing: 2px;
+  color: var(--accent-strong);
+  padding: 9px 14px;
+  border-bottom: 2px solid var(--border);
+  background: var(--panel-inset);
+  display: flex; align-items: center; gap: 8px;
+  text-transform: uppercase;
+  margin: 0;
+}
+.dh .window-title::before { content: '▶'; font-size: 12px; }
+.dh .window-title .spacer { flex: 1; }
+.dh .window-body { padding: 14px 16px; }
+
+/* ============================================================================
+   Party filter chips (menu rows)
+   ========================================================================= */
+.dh .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.dh .chip {
+  font-size: 15px; letter-spacing: .5px;
+  padding: 6px 14px;
+  color: var(--text);
+  background: var(--panel-inset);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: background-color .12s, color .12s, border-color .12s;
+}
+.dh .chip:hover { border-color: var(--border-bright); background: var(--select-bg-soft); }
+.dh .chip.active {
+  color: var(--select-text);
+  background: var(--select-bg);
+  border-color: var(--accent-strong);
+}
+.dh .chip.active::before { content: '▸ '; }
+
+/* month nav in the calendar window title */
+.dh .nav-btn {
+  font-size: 15px; line-height: 1;
+  color: var(--accent-strong); background: transparent;
+  border: 2px solid var(--border); padding: 4px 10px; cursor: pointer;
+}
+.dh .nav-btn:hover { background: var(--select-bg); color: var(--select-text); border-color: var(--accent-strong); }
+
+/* legend */
+.dh .legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 12px; font-size: 14px; color: var(--text-dim); }
+.dh .legend span::before {
+  content: ''; display: inline-block; width: 10px; height: 10px; margin-right: 6px;
+  background: var(--swatch);
+}
+
+/* ============================================================================
+   react-big-calendar, re-skinned
+   ========================================================================= */
+.dh .rbc-month-view { border: 2px solid var(--border); background: var(--panel); }
+.dh .rbc-header {
+  font-family: var(--font-pixel-bold); font-weight: normal;
+  font-size: 14px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-dim);
+  background: var(--panel-inset);
+  border-bottom: 2px solid var(--border);
+  padding: 6px 3px;
+}
+.dh .rbc-header + .rbc-header,
+.dh .rbc-day-bg + .rbc-day-bg { border-left: 1px solid var(--border); }
+.dh .rbc-month-row + .rbc-month-row { border-top: 1px solid var(--border); }
+.dh .rbc-off-range-bg { background-color: var(--panel-inset) !important; }
+.dh .rbc-off-range { color: var(--text-dim); opacity: .55; }
+.dh .rbc-date-cell { font-size: 14px; padding: 4px 6px; }
+.dh .rbc-day-bg:hover { background-color: var(--select-bg-soft) !important; }
+.dh .rbc-day-bg:active { background-color: var(--select-bg) !important; }
+.dh .rbc-day-bg { -webkit-tap-highlight-color: var(--select-bg); }
+
+.dh .rbc-today { background-color: transparent !important; border: none !important; box-shadow: none; }
+.dh .rbc-day-bg.is-today {
+  background-color: var(--select-bg-soft) !important;
+  box-shadow: inset 0 0 0 2px var(--accent-strong);
+}
+.dh .rbc-date-cell.rbc-now { color: var(--accent-strong); font-family: var(--font-pixel-bold); }
+
+.dh .rbc-event {
+  font-family: var(--font-pixel-bold);
+  border: none !important;
+  box-shadow: 0 2px 0 var(--panel-shadow);
+}
+.dh .rbc-event.ev-core   { background-color: var(--ev-core); }
+.dh .rbc-event.ev-dealer { background-color: var(--ev-dealer); }
+.dh .rbc-event.ev-other  { background-color: var(--ev-other); }
+.dh .rbc-event, .dh .rbc-event-content { color: var(--ev-text); font-size: 13px !important; }
+
+/* ============================================================================
+   Day modal (bottom sheet) + location cards
+   ========================================================================= */
+.dh .event-detail-modal-backdrop { background-color: rgba(0, 0, 0, 0.5); }
+.dh .event-detail-modal {
+  background: var(--panel);
+  border: 2px solid var(--border-bright);
+  border-bottom: none;
+  border-radius: 0;
+  box-shadow: 0 -3px 0 var(--panel-shadow), inset 0 0 0 1px var(--panel-hi);
+}
+.dh .event-detail-header {
+  background: var(--panel-inset);
+  border-bottom: 2px solid var(--border);
+  padding: 12px 16px;
+  gap: 8px;
+}
+.dh .event-detail-header h2 {
+  flex: 1; text-align: center;
+  font-size: 18px; letter-spacing: 1px;
+  color: var(--accent-strong);
+}
+.dh .date-nav-arrow, .dh .event-detail-close {
+  color: var(--text); font-family: var(--font-pixel-bold);
+  border: 2px solid var(--border);
+}
+.dh .date-nav-arrow:hover, .dh .event-detail-close:hover {
+  background: var(--select-bg); color: var(--select-text); border-color: var(--accent-strong);
+}
+.dh .date-nav-arrow:disabled { color: var(--border); border-color: var(--border); }
+.dh .date-nav-arrow:disabled:hover { background: transparent; }
+.dh .event-detail-content { padding: 16px; }
+
+.dh .location-groups, .dh .loc-list { display: flex; flex-direction: column; gap: 12px; }
+.dh .location-group, .dh .loc-card {
+  background: var(--panel-inset);
+  border: 2px solid var(--border);
+  border-left: 4px solid var(--green);
+  padding: 10px 14px;
+}
+.dh .location-header, .dh .loc-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  margin-bottom: 6px; padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border);
+}
+.dh .location-name, .dh .loc-name { font-family: var(--font-pixel-bold); font-size: 17px; color: var(--accent-strong); }
+.dh .location-count, .dh .loc-count {
+  font-size: 14px; color: var(--text-dim);
+  background: none; padding: 0;
+}
+.dh .location-attendees, .dh .loc-people { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.dh .attendee-item, .dh .loc-person { font-size: 16px; color: var(--text); padding: 0; }
+.dh .no-locations, .dh .loc-empty { text-align: center; padding: 24px 12px; color: var(--text-dim); font-size: 16px; }
+
+/* standalone /locations embed: no stage chrome, just the window */
+.dh.locations-view .window { margin: 0; min-height: 100vh; border: none; box-shadow: none; }
+
+@media (max-width: 600px) {
+  .dh .hud-word { font-size: 16px; }
+  .dh .hud-crumb, .dh .hud-sep { display: none; }
+  .dh .hud-btn { padding: 0 12px; }
+  .dh .stage { padding-left: 10px; padding-right: 10px; }
+  .dh .window-body { padding: 10px; }
+  .dh .chip { font-size: 14px; padding: 5px 10px; }
+  .dh .rbc-event, .dh .rbc-event-content { font-size: 11px !important; }
+}
+
+/* let the month grow to fit its weeks (the old 660px cap clipped 5-week months) */
+.dh.devhouse-view .rbc-calendar { height: auto !important; }

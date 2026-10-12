@@ -7,43 +7,29 @@ import { prepareEventForCalendar, parseDateString } from './dateUtils';
 import { getTodayInJST } from './locationUtils';
 import DateLocationModal from './DateLocationModal';
 import CurrentLocations from './CurrentLocations';
+import useTheme from './useTheme';
 
 // Setup the localizer for react-big-calendar
 const localizer = momentLocalizer(moment);
 
-// Define colors for event types (darker for better text readability)
-const EVENT_COLORS = {
-  'core': '#00897B',          // Darker teal for core events with attendees
-  'dealers-choice': '#F57C00', // Darker orange for dealer's choice
-  'other': '#8E24AA'           // Darker purple for other events (Land, Leave, custom)
+// Event type -> CSS class (colours come from the blog palette in theme.css)
+const EVENT_CLASSES = {
+  'core': 'ev-core',
+  'dealers-choice': 'ev-dealer',
+  'other': 'ev-other'
 };
+
+// Months the trip spans - month navigation is clamped to these
+const FIRST_MONTH = new Date(2027, 1, 1); // February 2027
+const LAST_MONTH = new Date(2027, 2, 1);  // March 2027
 
 // Devhouse dates
 const DEVHOUSE_DATES = [
   // Core events with attendees
-  {"id":1743312030622,"title":"Sendai","start":"2025-10-26","end":"2025-10-30","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
-  {"id":1743311975675,"title":"Tokyo","start":"2025-10-30","end":"2025-11-01","allDay":true,"type":"core","attendees":["BB","DB","DT","GG","JG","VB","YV"]},
-  {"id":1743312066182,"title":"Fukuoka","start":"2025-11-08","end":"2025-11-12","allDay":true,"type":"core","attendees":["BB","DB","DT","JG","YV"]},
-  {"id":1757817492179,"title":"Okayama","start":"2025-11-12","end":"2025-11-13","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
-  {"id":1743312070472,"title":"Osaka","start":"2025-11-13","end":"2025-11-17","allDay":true,"type":"core","attendees":["BB","DB","DT","YV"]},
+  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-18","end":"2027-03-18","allDay":true,"type":"core","attendees":["BB"]},
 
-  // Other events (no attendees)
-  {"id":1743313244238,"title":"Land","start":"2025-10-26","end":"2025-10-26","allDay":true,"type":"other"},
-  {"id":1743312089552,"title":"Leave","start":"2025-11-17","end":"2025-11-17","allDay":true,"type":"other"},
-
-  // Dealer's choice events
-  {"id":1700000001,"title":"Karuizawa","start":"2025-11-01","end":"2025-11-02","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000002,"title":"Osaka","start":"2025-11-01","end":"2025-11-02","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000003,"title":"Tokyo","start":"2025-11-01","end":"2025-11-05","allDay":true,"type":"dealers-choice","attendees":["BB","GG","VB","YV"]},
-  {"id":1700000004,"title":"Otsu","start":"2025-11-02","end":"2025-11-03","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000005,"title":"Toyama","start":"2025-11-02","end":"2025-11-04","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000006,"title":"Higashiomi","start":"2025-11-03","end":"2025-11-04","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000007,"title":"Nagahama","start":"2025-11-04","end":"2025-11-05","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000008,"title":"Shirakawa-Go","start":"2025-11-04","end":"2025-11-05","allDay":true,"type":"dealers-choice","attendees":["DT","JG"]},
-  {"id":1700000009,"title":"Kanazawa","start":"2025-11-05","end":"2025-11-08","allDay":true,"type":"dealers-choice","attendees":["BB","DT","GG","JG","YV"]},
-  {"id":1700000010,"title":"Tsuruga","start":"2025-11-05","end":"2025-11-06","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000011,"title":"Takashima","start":"2025-11-06","end":"2025-11-07","allDay":true,"type":"dealers-choice","attendees":["DB"]},
-  {"id":1700000012,"title":"Otsu","start":"2025-11-07","end":"2025-11-08","allDay":true,"type":"dealers-choice","attendees":["DB"]}
+  // Other events
+  {"id":1791000000002,"title":"Land","start":"2027-02-18","end":"2027-02-18","allDay":true,"type":"other"}
 ];
 
 // Calendar overlay component to capture clicks on dates
@@ -243,7 +229,8 @@ function DevhouseView() {
   };
 
   const [events] = useState(loadInitialEvents);
-  const [currentDate] = useState(new Date(2025, 10, 1)); // November 2025
+  const [currentDate, setCurrentDate] = useState(FIRST_MONTH);
+  const { theme, toggleTheme } = useTheme();
   const [selectedAttendees, setSelectedAttendees] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
@@ -302,41 +289,23 @@ function DevhouseView() {
     setSelectedDate(null);
   };
 
-  // Function to get event style based on type
-  const eventStyleGetter = (event) => {
-    const backgroundColor = EVENT_COLORS[event.type] || EVENT_COLORS['other'];
-    return {
-      style: {
-        backgroundColor,
-        borderRadius: '0',
-        opacity: 0.9,
-        color: 'white',
-        border: '2px solid rgba(0, 0, 0, 0.3)',
-        display: 'block',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        minHeight: '24px',
-        lineHeight: '1.2'
-      }
-    };
+  // Function to get event class based on type
+  const eventStyleGetter = (event) => ({
+    className: EVENT_CLASSES[event.type] || EVENT_CLASSES['other']
+  });
+
+  // Month navigation (clamped to the trip)
+  const shiftMonth = (delta) => {
+    setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
   };
+  const isFirstMonth = currentDate.getTime() <= FIRST_MONTH.getTime();
+  const isLastMonth = currentDate.getTime() >= LAST_MONTH.getTime();
+  const monthLabel = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
   // Function to highlight today's date
-  const dayPropGetter = (date) => {
-    const isToday = date.toDateString() === getTodayInJST().toDateString();
-
-    if (isToday) {
-      return {
-        style: {
-          backgroundColor: 'rgba(255, 0, 0, 0.1)',
-          border: '2px solid #FF0000',
-          boxShadow: 'inset 0 0 10px rgba(255, 0, 0, 0.3)'
-        }
-      };
-    }
-    return {};
-  };
+  const dayPropGetter = (date) => (
+    date.toDateString() === getTodayInJST().toDateString() ? { className: 'is-today' } : {}
+  );
 
   // Update document title
   useEffect(() => {
@@ -344,83 +313,94 @@ function DevhouseView() {
   }, []);
 
   return (
-    <div className="App devhouse-view" style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px', gap: '15px' }}>
-        <img
-          src="/logo-white.svg"
-          alt="devhouse logo"
-          style={{ height: '60px', filter: 'drop-shadow(0 0 5px rgba(255, 0, 0, 0.3))' }}
-        />
-      </div>
-
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', alignItems: 'center' }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontWeight: 'bold', marginRight: '5px' }}>Filter:</span>
-          <button
-            onClick={() => setSelectedAttendees([])}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '0',
-              border: selectedAttendees.length === 0 ? '2px solid #FF0000' : '2px solid #333333',
-              backgroundColor: selectedAttendees.length === 0 ? '#FF0000' : '#1a1a1a',
-              color: selectedAttendees.length === 0 ? 'white' : '#ffffff',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: selectedAttendees.length === 0 ? 'bold' : 'normal',
-              transition: 'all 0.2s'
-            }}
-          >
-            All
-          </button>
-          {MEMBERS.map(member => (
-            <button
-              key={member.initials}
-              onClick={() => toggleAttendee(member.initials)}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '0',
-                border: selectedAttendees.includes(member.initials) ? '2px solid #FF0000' : '2px solid #333333',
-                backgroundColor: selectedAttendees.includes(member.initials) ? '#FF0000' : '#1a1a1a',
-                color: selectedAttendees.includes(member.initials) ? 'white' : '#ffffff',
-                cursor: 'pointer',
-                fontSize: '13px',
-                fontWeight: selectedAttendees.includes(member.initials) ? 'bold' : 'normal',
-                transition: 'all 0.2s'
-              }}
-            >
-              {member.name}
-            </button>
-          ))}
+    <div className="dh devhouse-view" data-theme={theme}>
+      <header className="hud">
+        <div className="hud-left">
+          <a href="https://devhou.se" className="hud-home">
+            <img src="/logo-white.svg" alt="devhou.se" className="hud-logo" />
+            <span className="hud-word">calendar.devhou.se</span>
+          </a>
+          <span className="hud-sep">│</span>
+          <span className="hud-crumb hud-loc">devhouse 3</span>
+          <span className="hud-sep">│</span>
+          <span className="hud-crumb">{monthLabel}</span>
         </div>
-      </div>
+        <div className="hud-right">
+          <button type="button" className="hud-btn" onClick={toggleTheme} title="Toggle theme (T)">
+            {theme === 'dark' ? '☀ DAY' : '☾ NIGHT'}
+          </button>
+        </div>
+      </header>
 
-      <div style={{ position: 'relative' }}>
-        <Calendar
-          localizer={localizer}
-          events={filteredEvents.map(prepareEventForCalendar)}
-          startAccessor="start"
-          endAccessor="end"
-          eventPropGetter={eventStyleGetter}
-          dayPropGetter={dayPropGetter}
-          defaultView="month"
-          views={['month']}
-          toolbar={false}
-          showAllEvents={true}
-          style={{ height: 900 }}
-          drilldownView={null}
-          date={currentDate}
-          onNavigate={() => {}} // Disable navigation
+      <main className="stage">
+        <section className="window">
+          <h2 className="window-title">Party</h2>
+          <div className="window-body">
+            <div className="chips">
+              <button
+                type="button"
+                className={`chip${selectedAttendees.length === 0 ? ' active' : ''}`}
+                onClick={() => setSelectedAttendees([])}
+              >
+                All
+              </button>
+              {MEMBERS.map(member => (
+                <button
+                  type="button"
+                  key={member.initials}
+                  className={`chip${selectedAttendees.includes(member.initials) ? ' active' : ''}`}
+                  onClick={() => toggleAttendee(member.initials)}
+                >
+                  {member.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="window">
+          <h2 className="window-title">
+            {monthLabel}
+            <span className="spacer" />
+            <button type="button" className="nav-btn" onClick={() => shiftMonth(-1)} disabled={isFirstMonth} aria-label="Previous month">◀</button>
+            <button type="button" className="nav-btn" onClick={() => shiftMonth(1)} disabled={isLastMonth} aria-label="Next month">▶</button>
+          </h2>
+          <div className="window-body">
+            <div style={{ position: 'relative' }}>
+              <Calendar
+                localizer={localizer}
+                events={filteredEvents.map(prepareEventForCalendar)}
+                startAccessor="start"
+                endAccessor="end"
+                eventPropGetter={eventStyleGetter}
+                dayPropGetter={dayPropGetter}
+                defaultView="month"
+                views={['month']}
+                toolbar={false}
+                showAllEvents={true}
+                style={{ height: 900 }}
+                drilldownView={null}
+                date={currentDate}
+                onNavigate={() => {}} // Navigation is driven by the window title buttons
+              />
+              {/* Overlay grid to capture clicks */}
+              <CalendarOverlay currentDate={currentDate} onDateClick={handleDateClick} />
+            </div>
+            <div className="legend">
+              <span style={{ '--swatch': 'var(--ev-core)' }}>Core</span>
+              <span style={{ '--swatch': 'var(--ev-dealer)' }}>Dealer's choice</span>
+              <span style={{ '--swatch': 'var(--ev-other)' }}>Travel</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Current Location Tracker */}
+        <CurrentLocations
+          date={getTodayInJST()}
+          events={events}
+          members={MEMBERS}
         />
-        {/* Overlay grid to capture clicks */}
-        <CalendarOverlay currentDate={currentDate} onDateClick={handleDateClick} />
-      </div>
-
-      {/* Current Location Tracker */}
-      <CurrentLocations
-        date={getTodayInJST()}
-        events={events}
-        members={MEMBERS}
-      />
+      </main>
 
       {/* Event Detail Modal - Disabled, using date modal instead */}
       {/* {showEventModal && selectedEvent && (

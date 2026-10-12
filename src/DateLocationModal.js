@@ -6,8 +6,8 @@ const DateLocationModal = ({ date, events, members, onClose }) => {
   const [currentDate, setCurrentDate] = useState(date ? new Date(date) : new Date());
 
   // Define calendar bounds
-  const minDate = new Date(2025, 9, 26); // October 26, 2025 (month is 0-indexed)
-  const maxDate = new Date(2025, 10, 22); // November 22, 2025
+  const minDate = new Date(2027, 1, 18); // February 18, 2027 (month is 0-indexed)
+  const maxDate = new Date(2027, 2, 18); // March 18, 2027
 
   // Check if current date is at bounds
   const isAtMinDate = currentDate.toDateString() === minDate.toDateString();

@@ -1143,11 +1143,6 @@ button.load-devhouse {
   z-index: auto !important;
 }
 
-/* Hide weeks after Nov 22 (hide last 2 week rows) */
-.devhouse-view .rbc-month-view .rbc-month-row:nth-last-child(-n+2) {
-  display: none !important;
-}
-
 /* Event Detail Modal - Bottom Sheet */
 .event-detail-modal-backdrop {
   position: fixed;
