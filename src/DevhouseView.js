@@ -22,14 +22,12 @@ const EVENT_CLASSES = {
 // Months the trip spans - month navigation is clamped to these
 const FIRST_MONTH = new Date(2027, 1, 1); // February 2027
 const LAST_MONTH = new Date(2027, 1, 1);  // February 2027
-const TRIP_LAST_DAY = new Date(2027, 1, 28); // where open-ended stays are drawn to
 
 // Devhouse dates
 const DEVHOUSE_DATES = [
   // Core events with attendees
-  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-18","end":"2027-02-28","allDay":true,"type":"core","attendees":["BB"]},
-  // end: null = end date not known yet (drawn to TRIP_LAST_DAY, never shown as departing)
-  {"id":1791000000004,"title":"Devhouse 3","start":"2027-02-18","end":null,"allDay":true,"type":"core","attendees":["DT"]},
+  // openEndedFor: attendees whose end date isn't known yet (never shown as departing)
+  {"id":1791000000001,"title":"Devhouse 3","start":"2027-02-18","end":"2027-02-28","allDay":true,"type":"core","attendees":["BB","DT"],"openEndedFor":["DT"]},
 
   // Other events
   {"id":1791000000002,"title":"Land","start":"2027-02-18","end":"2027-02-18","allDay":true,"type":"other"}
@@ -227,8 +225,7 @@ function DevhouseView() {
     return DEVHOUSE_DATES.map(event => ({
       ...event,
       start: parseDateString(event.start),
-      end: event.end ? parseDateString(event.end) : TRIP_LAST_DAY,
-      openEnded: !event.end
+      end: parseDateString(event.end)
     }));
   };
 

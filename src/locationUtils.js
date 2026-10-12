@@ -25,8 +25,9 @@ export const getLocationsForDate = (selectedDate, events, members) => {
 
     if (event.attendees && event.attendees.length > 0) {
       event.attendees.forEach(initials => {
-        // Check if this event is ending on selectedDate (open-ended stays never end)
-        if (!event.openEnded && eventEnd.getTime() === date.getTime()) {
+        // Check if this event is ending on selectedDate (skip people whose end date isn't known yet)
+        const isOpenEnded = event.openEndedFor && event.openEndedFor.includes(initials);
+        if (!isOpenEnded && eventEnd.getTime() === date.getTime()) {
           if (!travelerMap[initials]) {
             travelerMap[initials] = {};
           }
